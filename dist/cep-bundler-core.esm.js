@@ -167,7 +167,7 @@ function isTruthy(str) {
 
 function getConfig(pkg) {
   var debugPortEnvs = Object.keys(process.env).filter(function (key) {
-    return key.indexOf('DEBUG_PORT_') === 0;
+    return key.indexOf('CEP_DEBUG_PORT_') === 0;
   });
 
   if (!pkg.cep) {
@@ -175,22 +175,22 @@ function getConfig(pkg) {
   }
 
   var config = defaultsDeep({
-    bundleName: process.env.NAME,
-    bundleId: process.env.ID,
-    bundleVersion: process.env.VERSION,
-    hosts: process.env.HOSTS,
-    iconNormal: process.env.ICON_NORMAL,
-    iconRollover: process.env.ICON_ROLLOVER,
-    iconDarkNormal: process.env.ICON_DARK_NORMAL,
-    iconDarkRollover: process.env.ICON_DARK_ROLLOVER,
-    panelWidth: process.env.PANEL_WIDTH,
-    panelHeight: process.env.PANEL_HEIGHT,
+    bundleName: process.env.CEP_NAME,
+    bundleId: process.env.CEP_ID,
+    bundleVersion: process.env.CEP_VERSION,
+    hosts: process.env.CEP_HOSTS,
+    iconNormal: process.env.CEP_ICON_NORMAL,
+    iconRollover: process.env.CEP_ICON_ROLLOVER,
+    iconDarkNormal: process.env.CEP_ICON_DARK_NORMAL,
+    iconDarkRollover: process.env.CEP_ICON_DARK_ROLLOVER,
+    panelWidth: process.env.CEP_PANEL_WIDTH,
+    panelHeight: process.env.CEP_PANEL_HEIGHT,
     debugPorts: debugPortEnvs.length > 0 ? debugPortEnvs.reduce(function (obj, key) {
       obj[key] = parseInt(process.env[key], 10);
       return obj;
     }, {}) : undefined,
-    debugInProduction: isTruthy(process.env.DEBUG_IN_PRODUCTION),
-    cefParams: !process.env.CEF_PARAMS ? undefined : process.env.CEF_PARAMS.split(',')
+    debugInProduction: isTruthy(process.env.CEP_DEBUG_IN_PRODUCTION),
+    cefParams: !process.env.CEP_CEF_PARAMS ? undefined : process.env.CEP_CEF_PARAMS.split(',')
   }, {
     bundleName: pkg.cep && pkg.cep.name,
     bundleId: pkg.cep && pkg.cep.id,
@@ -295,7 +295,7 @@ function writeExtensionTemplates(_ref) {
       });
     }
 
-    var href = env == 'production' ? htmlFilename : "http://localhost:".concat(port);
+    var href = env === 'production' ? htmlFilename : "http://localhost:".concat(port);
     var panelContents = panelTemplate({
       title: bundleName,
       href: href

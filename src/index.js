@@ -60,9 +60,9 @@ export function getConfig(pkg) {
   }
   const config = defaultsDeep(
     {
-      bundleName: process.env.CEP_BUNDLE_NAME,
-      bundleId: process.env.CEP_BUNDLE_ID,
-      bundleVersion: process.env.CEP_BUNDLE_VERSION,
+      bundleName: process.env.CEP_NAME,
+      bundleId: process.env.CEP_ID,
+      bundleVersion: process.env.CEP_VERSION,
       hosts: process.env.CEP_HOSTS,
       iconNormal: process.env.CEP_ICON_NORMAL,
       iconRollover: process.env.CEP_ICON_ROLLOVER,
