@@ -52,12 +52,16 @@ function isTruthy(str) {
   return typeof str === 'string' && (str === '1' || str.toLowerCase() === 'true')
 }
 
-export function getConfig(pkg) {
+export function getConfig(pkg, env) {
   const debugPortEnvs = Object.keys(process.env)
     .filter((key) => key.indexOf('CEP_DEBUG_PORT_') === 0)
-  if (!pkg.cep) {
-    pkg.cep = {}
-  }
+  const pkgConfig = pkg.hasOwnProperty('cep')
+    ? (
+      pkg.cep.hasOwnProperty(env)
+        ? pkg.cep.env
+        : pkg.cep
+      )
+    : {}
   const config = defaultsDeep(
     {
       bundleName: process.env.CEP_NAME,
@@ -80,20 +84,20 @@ export function getConfig(pkg) {
       cefParams: !process.env.CEP_CEF_PARAMS ? undefined : process.env.CEP_CEF_PARAMS.split(',')
     },
     {
-      bundleName: pkg.cep && pkg.cep.name,
-      bundleId: pkg.cep && pkg.cep.id,
-      bundleVersion: pkg.cep && pkg.cep.version,
-      hosts: pkg.cep && pkg.cep.hosts,
-      iconNormal: pkg.cep.iconNormal,
-      iconRollover: pkg.cep.iconRollover,
-      iconDarkNormal: pkg.cep.iconDarkNormal,
-      iconDarkRollover: pkg.cep.iconDarkRollover,
-      panelWidth: pkg.cep.panelWidth,
-      panelHeight: pkg.cep.panelHeight,
-      debugPorts: pkg.cep.debugPorts,
-      debugInProduction: pkg.cep.debugInProduction,
-      lifecycle: pkg.cep.lifecycle,
-      cefParams: pkg.cep.cefParams
+      bundleName: pkgConfig.name,
+      bundleId: pkgConfig.id,
+      bundleVersion: pkgConfig.version,
+      hosts: pkgConfig.hosts,
+      iconNormal: pkgConfig.iconNormal,
+      iconRollover: pkgConfig.iconRollover,
+      iconDarkNormal: pkgConfig.iconDarkNormal,
+      iconDarkRollover: pkgConfig.iconDarkRollover,
+      panelWidth: pkgConfig.panelWidth,
+      panelHeight: pkgConfig.panelHeight,
+      debugPorts: pkgConfig.debugPorts,
+      debugInProduction: pkgConfig.debugInProduction,
+      lifecycle: pkgConfig.lifecycle,
+      cefParams: pkgConfig.cefParams
     },
     {
       bundleVersion: pkg.version,
@@ -307,7 +311,7 @@ export function compile(opts) {
   opts.root = opts.hasOwnProperty('root') ? opts.root : process.cwd()
   opts.htmlFilename = opts.hasOwnProperty('htmlFilename') ? opts.htmlFilename : 'index.html'
   opts.pkg = opts.hasOwnProperty('pkg') ? opts.pkg : require(path.join(opts.root, '/package.json'))
-  const config = getConfig(opts.pkg)
+  const config = getConfig(opts.pkg, opts.env)
   const hosts = parseHosts(config.hosts)
   let chain = Promise.resolve()
   if (opts.env === 'development') {
