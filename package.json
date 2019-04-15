@@ -1,0 +1,25 @@
+{
+  "name": "cep-bundler-core",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/cep-bundler-core.cjs.js",
+  "module": "dist/cep-bundler-core.esm.js",
+  "browser": "dist/cep-bundler-core.umd.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "fs-extra": "^7.0.1",
+    "lodash": "^4.17.11"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.4.3",
+    "@babel/preset-env": "^7.4.3",
+    "lodash-es": "^4.17.11",
+    "rollup": "^1.10.0",
+    "rollup-plugin-babel": "^4.3.2"
+  }
+}
