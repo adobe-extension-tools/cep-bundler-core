@@ -7,7 +7,7 @@ All the functionality is exposed through one simple function:
 const core = require('cep-bundler-core')
 
 core.compile({
-  out: '/path/to/dist            // REQUIRED type: string
+  out: '/path/to/dist',          // REQUIRED type: string
   devPort: 8080,                 // REQUIRED type: number
   env: 'production',             // OPTIONAL type: string, default: process.env.NODE_ENV
   root: '/path/to/project/root', // OPTIONAL type: string, default: process.cwd()
