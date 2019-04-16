@@ -149,7 +149,8 @@ export function objectToProcessEnv(object) {
 
 export function writeExtensionTemplates({
   env,
-  port,
+  devPort,
+  devHost,
   hosts,
   out,
   htmlFilename,
@@ -192,7 +193,7 @@ export function writeExtensionTemplates({
         const debugContents = debugTemplate(bundleId, hosts)
         chain = chain.then(() => fs.writeFile(path.join(out, '.debug'), debugContents))
       }
-      const href = env === 'production' ? htmlFilename : `http://localhost:${port}`
+      const href = env === 'production' ? htmlFilename : `http://${devHost}:${devPort}`
       const panelContents = panelTemplate({
         title: bundleName,
         href
@@ -311,6 +312,7 @@ export function compile(opts) {
   opts.root = opts.hasOwnProperty('root') ? opts.root : process.cwd()
   opts.htmlFilename = opts.hasOwnProperty('htmlFilename') ? opts.htmlFilename : 'index.html'
   opts.pkg = opts.hasOwnProperty('pkg') ? opts.pkg : require(path.join(opts.root, '/package.json'))
+  opts.devHost = opts.hasOwnProperty('devHost') ? opts.devHost : 'localhost'
   const config = getConfig(opts.pkg, opts.env)
   const hosts = parseHosts(config.hosts)
   let chain = Promise.resolve()
@@ -328,7 +330,8 @@ export function compile(opts) {
     writeExtensionTemplates({
       env: opts.env,
       hosts,
-      port: opts.devPort,
+      devPort: opts.devPort,
+      devHost: opts.devHost,
       htmlFilename: opts.htmlFilename,
       bundleName: config.bundleName,
       bundleId: config.bundleId,
