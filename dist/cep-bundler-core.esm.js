@@ -418,7 +418,7 @@ function compile(opts) {
   var hosts = parseHosts(config.hosts);
   var chain = Promise.resolve();
 
-  if (opts.env === 'development') {
+  if (opts.env !== 'production') {
     enablePlayerDebugMode();
 
     if (!config.noSymlink) {
