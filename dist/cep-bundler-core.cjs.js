@@ -369,12 +369,14 @@ function copyDependencies(_ref4) {
       out = _ref4.out,
       pkg = _ref4.pkg;
   var deps = pkg.dependencies || {};
-  return Promise.all(Object.keys(deps).forEach(function (dep) {
+  return Object.keys(deps).reduce(function (chain, dep) {
     var src = path.join(root, 'node_modules', dep);
     var dest = path.join(out, 'node_modules', dep);
 
     if (!fs.existsSync(dest)) {
-      return fs.copy(src, dest).then(function () {
+      return chain.then(function () {
+        return fs.copy(src, dest);
+      }).then(function () {
         return copyDependencies({
           root: root,
           out: out,
@@ -382,7 +384,9 @@ function copyDependencies(_ref4) {
         });
       });
     }
-  }));
+
+    return chain;
+  }, Promise.resolve());
 }
 function copyIcons(_ref5) {
   var root = _ref5.root,

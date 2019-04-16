@@ -256,18 +256,20 @@ export function symlinkExtension({ bundleId, out }) {
 
 export function copyDependencies({ root, out, pkg }) {
   const deps = pkg.dependencies || {}
-  return Promise.all(Object.keys(deps).forEach(dep => {
+  return Object.keys(deps).reduce((chain, dep) => {
     const src = path.join(root, 'node_modules', dep)
     const dest = path.join(out, 'node_modules', dep)
     if (!fs.existsSync(dest)) {
-      return fs.copy(src, dest)
+      return chain
+        .then(() => fs.copy(src, dest))
         .then(() => copyDependencies({
           root,
           out,
           pkg: fs.readJsonSync(path.join(root, 'node_modules', dep, 'package.json'))
         }))
     }
-  }))
+    return chain
+  }, Promise.resolve())
 }
 
 export function copyIcons({ root, out, config }) {
