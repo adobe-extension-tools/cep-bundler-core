@@ -314,7 +314,7 @@ export function compile(opts) {
   const config = getConfig(opts.pkg, opts.env)
   const hosts = parseHosts(config.hosts)
   let chain = Promise.resolve()
-  if (opts.env === 'development') {
+  if (opts.env !== 'production') {
     enablePlayerDebugMode()
     if (!config.noSymlink) {
       chain = chain.then(() =>
