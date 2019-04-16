@@ -255,32 +255,19 @@ export function symlinkExtension({ bundleId, out }) {
 }
 
 export function copyDependencies({ root, out, pkg }) {
-  return Promise.resolve()
-    .then(() => {
-      let chain = Promise.resolve()
-      const deps = pkg.dependencies || {}
-      Object.keys(deps).forEach(dep => {
-        try {
-          const src = path.join(root, 'node_modules', dep)
-          const dest = path.join(out, 'node_modules', dep)
-          if (!fs.existsSync(dest)) {
-            chain = chain.then(() => {
-              if (!fs.existsSync(dest)) {
-                return fs.copy(src, dest)
-              }
-            })
-          }
-        } catch (err) {
-          console.error('Error while copying', err)
-        }
-        chain = chain.then(() => copyDependencies({
+  const deps = pkg.dependencies || {}
+  return Promise.all(Object.keys(deps).forEach(dep => {
+    const src = path.join(root, 'node_modules', dep)
+    const dest = path.join(out, 'node_modules', dep)
+    if (!fs.existsSync(dest)) {
+      return fs.copy(src, dest)
+        .then(() => copyDependencies({
           root,
           out,
           pkg: fs.readJsonSync(path.join(root, 'node_modules', dep, 'package.json'))
         }))
-      })
-      return chain
-    })
+    }
+  }))
 }
 
 export function copyIcons({ root, out, config }) {

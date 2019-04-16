@@ -1,6 +1,6 @@
 {
   "name": "cep-bundler-core",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Core functionality for making bundler extensions to compile CEP",
   "main": "dist/cep-bundler-core.cjs.js",
   "module": "dist/cep-bundler-core.esm.js",
@@ -9,7 +9,15 @@
     "start": "rollup --config --watch",
     "build": "rollup --config"
   },
-  "keywords": ["Adobe", "CEP", "ExtendScript", "TypeScript", "Bundler", "Extension", "Plugin"],
+  "keywords": [
+    "Adobe",
+    "CEP",
+    "ExtendScript",
+    "TypeScript",
+    "Bundler",
+    "Extension",
+    "Plugin"
+  ],
   "author": "Koen Schmeets",
   "license": "MIT",
   "dependencies": {

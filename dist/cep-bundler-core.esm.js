@@ -244,7 +244,8 @@ function objectToProcessEnv(object) {
 }
 function writeExtensionTemplates(_ref) {
   var env = _ref.env,
-      port = _ref.port,
+      devPort = _ref.devPort,
+      devHost = _ref.devHost,
       hosts = _ref.hosts,
       out = _ref.out,
       htmlFilename = _ref.htmlFilename,
@@ -291,7 +292,7 @@ function writeExtensionTemplates(_ref) {
       });
     }
 
-    var href = env === 'production' ? htmlFilename : "http://localhost:".concat(port);
+    var href = env === 'production' ? htmlFilename : "http://".concat(devHost, ":").concat(devPort);
     var panelContents = panelTemplate({
       title: bundleName,
       href: href
@@ -361,35 +362,21 @@ function copyDependencies(_ref4) {
   var root = _ref4.root,
       out = _ref4.out,
       pkg = _ref4.pkg;
-  return Promise.resolve().then(function () {
-    var chain = Promise.resolve();
-    var deps = pkg.dependencies || {};
-    Object.keys(deps).forEach(function (dep) {
-      try {
-        var src = path.join(root, 'node_modules', dep);
-        var dest = path.join(out, 'node_modules', dep);
+  var deps = pkg.dependencies || {};
+  return Promise.all(Object.keys(deps).forEach(function (dep) {
+    var src = path.join(root, 'node_modules', dep);
+    var dest = path.join(out, 'node_modules', dep);
 
-        if (!fs.existsSync(dest)) {
-          chain = chain.then(function () {
-            if (!fs.existsSync(dest)) {
-              return fs.copy(src, dest);
-            }
-          });
-        }
-      } catch (err) {
-        console.error('Error while copying', err);
-      }
-
-      chain = chain.then(function () {
+    if (!fs.existsSync(dest)) {
+      return fs.copy(src, dest).then(function () {
         return copyDependencies({
           root: root,
           out: out,
           pkg: fs.readJsonSync(path.join(root, 'node_modules', dep, 'package.json'))
         });
       });
-    });
-    return chain;
-  });
+    }
+  }));
 }
 function copyIcons(_ref5) {
   var root = _ref5.root,
@@ -414,6 +401,7 @@ function compile(opts) {
   opts.root = opts.hasOwnProperty('root') ? opts.root : process.cwd();
   opts.htmlFilename = opts.hasOwnProperty('htmlFilename') ? opts.htmlFilename : 'index.html';
   opts.pkg = opts.hasOwnProperty('pkg') ? opts.pkg : require(path.join(opts.root, '/package.json'));
+  opts.devHost = opts.hasOwnProperty('devHost') ? opts.devHost : 'localhost';
   var config = getConfig(opts.pkg, opts.env);
   var hosts = parseHosts(config.hosts);
   var chain = Promise.resolve();
@@ -443,7 +431,8 @@ function compile(opts) {
     return writeExtensionTemplates((_writeExtensionTempla = {
       env: opts.env,
       hosts: hosts,
-      port: opts.devPort,
+      devPort: opts.devPort,
+      devHost: opts.devHost,
       htmlFilename: opts.htmlFilename,
       bundleName: config.bundleName,
       bundleId: config.bundleId,
