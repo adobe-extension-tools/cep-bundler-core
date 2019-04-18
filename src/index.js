@@ -80,7 +80,7 @@ export function getConfig(pkg, env) {
           return obj
         }, {})
         : undefined,
-      debugInProduction: isTruthy(process.env.CEP_DEBUG_IN_PRODUCTION),
+      debugInProduction: isTruthy(process.env.CEP_DEBUG_IN_PRODUCTION) || undefined,
       cefParams: !process.env.CEP_CEF_PARAMS ? undefined : process.env.CEP_CEF_PARAMS.split(',')
     },
     {

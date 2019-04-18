@@ -191,7 +191,7 @@ function getConfig(pkg, env) {
       obj[key] = parseInt(process.env[key], 10);
       return obj;
     }, {}) : undefined,
-    debugInProduction: isTruthy(process.env.CEP_DEBUG_IN_PRODUCTION),
+    debugInProduction: isTruthy(process.env.CEP_DEBUG_IN_PRODUCTION) || undefined,
     cefParams: !process.env.CEP_CEF_PARAMS ? undefined : process.env.CEP_CEF_PARAMS.split(',')
   }, {
     bundleName: pkgConfig.name,
