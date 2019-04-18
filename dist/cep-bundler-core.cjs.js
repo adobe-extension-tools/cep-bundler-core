@@ -416,7 +416,7 @@ function compile(opts) {
   opts.htmlFilename = opts.htmlFilename ? opts.htmlFilename : 'index.html';
   opts.pkg = opts.pkg ? opts.pkg : require(path.join(opts.root, '/package.json'));
   opts.devHost = opts.devHost ? opts.devHost : 'localhost';
-  opts.isDev = opts.isDev ? opts.isDev : true;
+  opts.hasOwnProperty('isDev') ? opts.isDev : true;
   var config = getConfig(opts.pkg, opts.env);
   var hosts = parseHosts(config.hosts);
   var chain = Promise.resolve();

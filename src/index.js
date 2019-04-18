@@ -309,7 +309,7 @@ export function compile(opts) {
   opts.htmlFilename = opts.htmlFilename ? opts.htmlFilename : 'index.html'
   opts.pkg = opts.pkg ? opts.pkg : require(path.join(opts.root, '/package.json'))
   opts.devHost = opts.devHost ? opts.devHost : 'localhost'
-  opts.isDev = opts.isDev ? opts.isDev : true
+  opts.hasOwnProperty('isDev') ? opts.isDev : true
   const config = getConfig(opts.pkg, opts.env)
   const hosts = parseHosts(config.hosts)
   let chain = Promise.resolve()
