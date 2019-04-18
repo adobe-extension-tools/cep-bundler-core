@@ -304,12 +304,12 @@ export function copyIcons({ root, out, config }) {
 }
 
 export function compile(opts) {
-  opts.env = opts.hasOwnProperty('env') ? opts.env : process.env.NODE_ENV
-  opts.root = opts.hasOwnProperty('root') ? opts.root : process.cwd()
-  opts.htmlFilename = opts.hasOwnProperty('htmlFilename') ? opts.htmlFilename : 'index.html'
-  opts.pkg = opts.hasOwnProperty('pkg') ? opts.pkg : require(path.join(opts.root, '/package.json'))
-  opts.devHost = opts.hasOwnProperty('devHost') ? opts.devHost : 'localhost'
-  opts.isDev = opts.hasOwnProperty('isDev') ? opts.isDev : true
+  opts.env = opts.env ? opts.env : process.env.NODE_ENV
+  opts.root = opts.root ? opts.root : process.cwd()
+  opts.htmlFilename = opts.htmlFilename ? opts.htmlFilename : 'index.html'
+  opts.pkg = opts.pkg ? opts.pkg : require(path.join(opts.root, '/package.json'))
+  opts.devHost = opts.devHost ? opts.devHost : 'localhost'
+  opts.isDev = opts.isDev ? opts.isDev : true
   const config = getConfig(opts.pkg, opts.env)
   const hosts = parseHosts(config.hosts)
   let chain = Promise.resolve()
