@@ -126,9 +126,9 @@ var panelTemplate = (function (_ref) {
 
 var debugTemplate = (function () {
   var bundleId = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'com.test.extension';
-  var hosts = arguments.length > 1 ? arguments[1] : undefined;
-  return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<ExtensionList>\n  <Extension Id=\"".concat(bundleId, "\">\n  <HostList>\n    ").concat(hosts.map(function (host, i) {
-    return "<Host Name=\"".concat(host.name.trim(), "\" Port=\"").concat('' + (3000 + i + 1), "\" />");
+  var debugPorts = arguments.length > 1 ? arguments[1] : undefined;
+  return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<ExtensionList>\n  <Extension Id=\"".concat(bundleId, "\">\n  <HostList>\n    ").concat(Object.keys(debugPorts).map(function (host) {
+    return "<Host Name=\"".concat(host.name.trim(), "\" Port=\"").concat(debugPorts[host], "\" />");
   }).join('\n    '), "\n  </HostList>\n  </Extension>\n</ExtensionList>");
 });
 
@@ -253,6 +253,7 @@ function writeExtensionTemplates(_ref) {
       devPort = _ref.devPort,
       devHost = _ref.devHost,
       hosts = _ref.hosts,
+      debugPorts = _ref.debugPorts,
       out = _ref.out,
       htmlFilename = _ref.htmlFilename,
       bundleName = _ref.bundleName,
@@ -293,7 +294,7 @@ function writeExtensionTemplates(_ref) {
     var chain = Promise.resolve();
 
     if (debugInProduction || isDev) {
-      var debugContents = debugTemplate(bundleId, hosts);
+      var debugContents = debugTemplate(bundleId, debugPorts);
       chain = chain.then(function () {
         return fs.writeFile(path.join(out, '.debug'), debugContents);
       });
@@ -463,6 +464,7 @@ function compile(opts) {
       iconDarkRollover: config.iconDarkRollover,
       panelWidth: config.panelWidth,
       panelHeight: config.panelHeight,
+      debugPorts: config.debugPorts,
       debugInProduction: config.debugInProduction,
       cefParams: config.cefParams,
       lifecycle: config.lifecycle

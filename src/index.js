@@ -152,6 +152,7 @@ export function writeExtensionTemplates({
   devPort,
   devHost,
   hosts,
+  debugPorts,
   out,
   htmlFilename,
   bundleName,
@@ -191,7 +192,7 @@ export function writeExtensionTemplates({
     .then(() => {
       let chain = Promise.resolve()
       if (debugInProduction || isDev) {
-        const debugContents = debugTemplate(bundleId, hosts)
+        const debugContents = debugTemplate(bundleId, debugPorts)
         chain = chain.then(() => fs.writeFile(path.join(out, '.debug'), debugContents))
       }
       const href = !isDev ? htmlFilename : `http://${devHost}:${devPort}`
@@ -344,6 +345,7 @@ export function compile(opts) {
       iconDarkRollover: config.iconDarkRollover,
       panelWidth: config.panelWidth,
       panelHeight: config.panelHeight,
+      debugPorts: config.debugPorts,
       debugInProduction: config.debugInProduction,
       cefParams: config.cefParams,
       lifecycle: config.lifecycle,
