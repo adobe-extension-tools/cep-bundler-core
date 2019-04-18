@@ -260,7 +260,12 @@ export function copyDependencies({ root, out, pkg }) {
   return Object.keys(deps).reduce((chain, dep) => {
     const src = path.join(root, 'node_modules', dep)
     const dest = path.join(out, 'node_modules', dep)
-    if (!fs.existsSync(dest)) {
+    let exists = false
+    try {
+      exists = fs.statSync(dest).isFile();
+    }
+    catch (err) {}
+    if (!exists) {
       chain = chain
         .then(() => fs.copy(src, dest))
         .catch(() => {

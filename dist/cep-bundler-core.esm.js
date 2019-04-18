@@ -367,8 +367,13 @@ function copyDependencies(_ref4) {
   return Object.keys(deps).reduce(function (chain, dep) {
     var src = path.join(root, 'node_modules', dep);
     var dest = path.join(out, 'node_modules', dep);
+    var exists = false;
 
-    if (!fs.existsSync(dest)) {
+    try {
+      exists = fs.statSync(dest).isFile();
+    } catch (err) {}
+
+    if (!exists) {
       chain = chain.then(function () {
         return fs.copy(src, dest);
       })["catch"](function () {
