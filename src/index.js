@@ -148,7 +148,7 @@ export function objectToProcessEnv(object) {
 }
 
 export function writeExtensionTemplates({
-  env,
+  isDev,
   devPort,
   devHost,
   hosts,
@@ -168,6 +168,7 @@ export function writeExtensionTemplates({
   cefParams
 }) {
   const manifestContents = manifestTemplate({
+    isDev,
     bundleName,
     bundleId,
     version: bundleVersion,
@@ -189,11 +190,11 @@ export function writeExtensionTemplates({
     .then(() => fs.writeFile(manifestFile, manifestContents))
     .then(() => {
       let chain = Promise.resolve()
-      if (debugInProduction || env !== 'production') {
+      if (debugInProduction || isDev) {
         const debugContents = debugTemplate(bundleId, hosts)
         chain = chain.then(() => fs.writeFile(path.join(out, '.debug'), debugContents))
       }
-      const href = env === 'production' ? htmlFilename : `http://${devHost}:${devPort}`
+      const href = !isDev ? htmlFilename : `http://${devHost}:${devPort}`
       const panelContents = panelTemplate({
         title: bundleName,
         href
@@ -260,13 +261,19 @@ export function copyDependencies({ root, out, pkg }) {
     const src = path.join(root, 'node_modules', dep)
     const dest = path.join(out, 'node_modules', dep)
     if (!fs.existsSync(dest)) {
-      return chain
+      chain = chain
         .then(() => fs.copy(src, dest))
+        .catch(() => {
+          console.error(
+            `Could not copy ${source} to ${dest}. Ensure the path is correct.`
+          )
+        })
         .then(() => copyDependencies({
           root,
           out,
           pkg: fs.readJsonSync(path.join(root, 'node_modules', dep, 'package.json'))
         }))
+      return chain
     }
     return chain
   }, Promise.resolve())
@@ -302,10 +309,11 @@ export function compile(opts) {
   opts.htmlFilename = opts.hasOwnProperty('htmlFilename') ? opts.htmlFilename : 'index.html'
   opts.pkg = opts.hasOwnProperty('pkg') ? opts.pkg : require(path.join(opts.root, '/package.json'))
   opts.devHost = opts.hasOwnProperty('devHost') ? opts.devHost : 'localhost'
+  opts.isDev = opts.hasOwnProperty('isDev') ? opts.isDev : true
   const config = getConfig(opts.pkg, opts.env)
   const hosts = parseHosts(config.hosts)
   let chain = Promise.resolve()
-  if (opts.env !== 'production') {
+  if (opts.isDev) {
     enablePlayerDebugMode()
     if (!config.noSymlink) {
       chain = chain.then(() =>
@@ -317,8 +325,8 @@ export function compile(opts) {
     copyDependencies({ root: opts.root, out: opts.out, pkg: opts.pkg })
   ).then(() =>
     writeExtensionTemplates({
-      env: opts.env,
       hosts,
+      isDev: opts.isDev,
       devPort: opts.devPort,
       devHost: opts.devHost,
       htmlFilename: opts.htmlFilename,

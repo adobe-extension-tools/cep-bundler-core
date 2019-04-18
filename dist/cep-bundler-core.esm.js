@@ -243,7 +243,7 @@ function objectToProcessEnv(object) {
   });
 }
 function writeExtensionTemplates(_ref) {
-  var env = _ref.env,
+  var isDev = _ref.isDev,
       devPort = _ref.devPort,
       devHost = _ref.devHost,
       hosts = _ref.hosts,
@@ -262,6 +262,7 @@ function writeExtensionTemplates(_ref) {
       lifecycle = _ref.lifecycle,
       cefParams = _ref.cefParams;
   var manifestContents = manifestTemplate({
+    isDev: isDev,
     bundleName: bundleName,
     bundleId: bundleId,
     version: bundleVersion,
@@ -285,14 +286,14 @@ function writeExtensionTemplates(_ref) {
   }).then(function () {
     var chain = Promise.resolve();
 
-    if (debugInProduction || env !== 'production') {
+    if (debugInProduction || isDev) {
       var debugContents = debugTemplate(bundleId, hosts);
       chain = chain.then(function () {
         return fs.writeFile(path.join(out, '.debug'), debugContents);
       });
     }
 
-    var href = env === 'production' ? htmlFilename : "http://".concat(devHost, ":").concat(devPort);
+    var href = !isDev ? htmlFilename : "http://".concat(devHost, ":").concat(devPort);
     var panelContents = panelTemplate({
       title: bundleName,
       href: href
@@ -368,8 +369,10 @@ function copyDependencies(_ref4) {
     var dest = path.join(out, 'node_modules', dep);
 
     if (!fs.existsSync(dest)) {
-      return chain.then(function () {
+      chain = chain.then(function () {
         return fs.copy(src, dest);
+      })["catch"](function () {
+        console.error("Could not copy ".concat(source, " to ").concat(dest, ". Ensure the path is correct."));
       }).then(function () {
         return copyDependencies({
           root: root,
@@ -377,6 +380,7 @@ function copyDependencies(_ref4) {
           pkg: fs.readJsonSync(path.join(root, 'node_modules', dep, 'package.json'))
         });
       });
+      return chain;
     }
 
     return chain;
@@ -406,11 +410,12 @@ function compile(opts) {
   opts.htmlFilename = opts.hasOwnProperty('htmlFilename') ? opts.htmlFilename : 'index.html';
   opts.pkg = opts.hasOwnProperty('pkg') ? opts.pkg : require(path.join(opts.root, '/package.json'));
   opts.devHost = opts.hasOwnProperty('devHost') ? opts.devHost : 'localhost';
+  opts.isDev = opts.hasOwnProperty('isDev') ? opts.isDev : true;
   var config = getConfig(opts.pkg, opts.env);
   var hosts = parseHosts(config.hosts);
   var chain = Promise.resolve();
 
-  if (opts.env !== 'production') {
+  if (opts.isDev) {
     enablePlayerDebugMode();
 
     if (!config.noSymlink) {
@@ -433,8 +438,8 @@ function compile(opts) {
     var _writeExtensionTempla;
 
     return writeExtensionTemplates((_writeExtensionTempla = {
-      env: opts.env,
       hosts: hosts,
+      isDev: opts.isDev,
       devPort: opts.devPort,
       devHost: opts.devHost,
       htmlFilename: opts.htmlFilename,
