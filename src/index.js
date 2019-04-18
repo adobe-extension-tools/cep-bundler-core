@@ -265,7 +265,7 @@ export function copyDependencies({ root, out, pkg }) {
         .then(() => fs.copy(src, dest))
         .catch(() => {
           console.error(
-            `Could not copy ${source} to ${dest}. Ensure the path is correct.`
+            `Could not copy ${src} to ${dest}. Ensure the path is correct.`
           )
         })
         .then(() => copyDependencies({

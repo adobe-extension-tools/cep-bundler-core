@@ -378,7 +378,7 @@ function copyDependencies(_ref4) {
       chain = chain.then(function () {
         return fs.copy(src, dest);
       })["catch"](function () {
-        console.error("Could not copy ".concat(source, " to ").concat(dest, ". Ensure the path is correct."));
+        console.error("Could not copy ".concat(src, " to ").concat(dest, ". Ensure the path is correct."));
       }).then(function () {
         return copyDependencies({
           root: root,
