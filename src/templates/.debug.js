@@ -6,7 +6,7 @@ export default (bundleId = 'com.test.extension', debugPorts) => {
     ${Object.keys(debugPorts)
       .map(
         (host) =>
-          `<Host Name="${host.name.trim()}" Port="${debugPorts[host]}" />`
+          `<Host Name="${host.trim()}" Port="${debugPorts[host]}" />`
       )
       .join('\n    ')}
   </HostList>

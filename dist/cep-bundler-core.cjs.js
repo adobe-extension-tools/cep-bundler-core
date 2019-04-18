@@ -128,7 +128,7 @@ var debugTemplate = (function () {
   var bundleId = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'com.test.extension';
   var debugPorts = arguments.length > 1 ? arguments[1] : undefined;
   return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<ExtensionList>\n  <Extension Id=\"".concat(bundleId, "\">\n  <HostList>\n    ").concat(Object.keys(debugPorts).map(function (host) {
-    return "<Host Name=\"".concat(host.name.trim(), "\" Port=\"").concat(debugPorts[host], "\" />");
+    return "<Host Name=\"".concat(host.trim(), "\" Port=\"").concat(debugPorts[host], "\" />");
   }).join('\n    '), "\n  </HostList>\n  </Extension>\n</ExtensionList>");
 });
 
