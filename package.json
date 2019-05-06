@@ -5,6 +5,9 @@
   "main": "dist/cep-bundler-core.cjs.js",
   "module": "dist/cep-bundler-core.esm.js",
   "browser": "dist/cep-bundler-core.umd.js",
+  "bin": {
+    "cep-bundler-core": "./bin.js"
+  },
   "scripts": {
     "start": "rollup --config --watch",
     "build": "rollup --config"
@@ -22,7 +25,8 @@
   "license": "MIT",
   "dependencies": {
     "fs-extra": "^7.0.1",
-    "lodash": "^4.17.11"
+    "lodash": "^4.17.11",
+    "yargs": "^13.0.0-candidate.0"
   },
   "devDependencies": {
     "@babel/core": "^7.4.3",
