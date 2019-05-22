@@ -1,6 +1,6 @@
 {
   "name": "cep-bundler-core",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "Core functionality for making bundler extensions to compile CEP",
   "main": "dist/cep-bundler-core.cjs.js",
   "module": "dist/cep-bundler-core.esm.js",
@@ -32,6 +32,8 @@
     "@babel/core": "^7.4.3",
     "@babel/preset-env": "^7.4.3",
     "rollup": "^1.10.0",
-    "rollup-plugin-babel": "^4.3.2"
+    "rollup-plugin-babel": "^4.3.2",
+    "tape": "^4.10.1",
+    "xml-js": "^1.6.11"
   }
 }

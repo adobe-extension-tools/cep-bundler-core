@@ -58,7 +58,7 @@ export function getConfig(pkg, env) {
   const pkgConfig = pkg.hasOwnProperty('cep')
     ? (
       pkg.cep.hasOwnProperty(env)
-        ? pkg.cep.env
+        ? pkg.cep[env]
         : pkg.cep
       )
     : {}
@@ -67,6 +67,7 @@ export function getConfig(pkg, env) {
       bundleName: process.env.CEP_NAME,
       bundleId: process.env.CEP_ID,
       bundleVersion: process.env.CEP_VERSION,
+      cepVersion: process.env.CEP_CEP_VERSION,
       hosts: process.env.CEP_HOSTS,
       iconNormal: process.env.CEP_ICON_NORMAL,
       iconRollover: process.env.CEP_ICON_ROLLOVER,
@@ -74,6 +75,10 @@ export function getConfig(pkg, env) {
       iconDarkRollover: process.env.CEP_ICON_DARK_ROLLOVER,
       panelWidth: process.env.CEP_PANEL_WIDTH,
       panelHeight: process.env.CEP_PANEL_HEIGHT,
+      panelMinWidth: process.env.CEP_PANEL_MIN_WIDTH,
+      panelMinHeight: process.env.CEP_PANEL_MIN_HEIGHT,
+      panelMaxWidth: process.env.CEP_PANEL_MAX_WIDTH,
+      panelMaxHeight: process.env.CEP_PANEL_MAX_HEIGHT,
       debugPorts: debugPortEnvs.length > 0
         ? debugPortEnvs.reduce((obj, key) => {
           obj[key] = parseInt(process.env[key], 10)
@@ -87,6 +92,7 @@ export function getConfig(pkg, env) {
       bundleName: pkgConfig.name,
       bundleId: pkgConfig.id,
       bundleVersion: pkgConfig.version,
+      cepVersion: pkgConfig.cepVersion,
       hosts: pkgConfig.hosts,
       iconNormal: pkgConfig.iconNormal,
       iconRollover: pkgConfig.iconRollover,
@@ -94,96 +100,51 @@ export function getConfig(pkg, env) {
       iconDarkRollover: pkgConfig.iconDarkRollover,
       panelWidth: pkgConfig.panelWidth,
       panelHeight: pkgConfig.panelHeight,
+      panelMinWidth: pkgConfig.panelMinWidth,
+      panelMinHeight: pkgConfig.panelMinHeight,
+      panelMaxWidth: pkgConfig.panelMaxWidth,
+      panelMaxHeight: pkgConfig.panelMaxHeight,
       debugPorts: pkgConfig.debugPorts,
       debugInProduction: pkgConfig.debugInProduction,
       lifecycle: pkgConfig.lifecycle,
-      cefParams: pkgConfig.cefParams
+      cefParams: pkgConfig.cefParams,
+      extensions: pkgConfig.extensions
     },
     {
       bundleVersion: pkg.version,
     },
     {
-      bundleName: 'Parcel CEP Extension',
+      ...mergeExtensionDefaults({}),
+      bundleName: 'CEP Extension',
       bundleId: 'com.mycompany.myextension',
       bundleVersion: '0.0.1',
       hosts: '*',
-      panelWidth: 500,
-      panelHeight: 500,
       debugInProduction: false,
-      debugPorts: {
-        PHXS: 3001,
-        IDSN: 3002,
-        AICY: 3003,
-        ILST: 3004,
-        PPRO: 3005,
-        PRLD: 3006,
-        AEFT: 3007,
-        FLPR: 3008,
-        AUDT: 3009,
-        DRWV: 3010,
-        MUST: 3011,
-        KBRG: 3012,
-      },
-      lifecycle: { autoVisible: true, startOnEvents: [] },
-      cefParams: [
-        '--allow-file-access-from-files',
-        '--allow-file-access',
-        '--enable-nodejs',
-        '--mixed-context'
-      ]
+      cepVersion: '6.0'
     }
   )
   return config
 }
 
-export function objectToProcessEnv(object) {
+export function objectToProcessEnv(obj) {
   // assign object to process.env so they can be used in the code
-  Object.keys(object).forEach(key => {
+  Object.keys(obj).forEach(key => {
     const envKey = camelToSnake(key).toUpperCase()
-    const value = typeof object[key] === 'string'
-      ? object[key]
-      : JSON.stringify(object[key])
+    const value = typeof obj[key] === 'string'
+      ? obj[key]
+      : JSON.stringify(obj[key])
     process.env[envKey] = value
   })
 }
 
-export function writeExtensionTemplates({
-  isDev,
-  devPort,
-  devHost,
-  hosts,
-  debugPorts,
-  out,
-  htmlFilename,
-  bundleName,
-  bundleId,
-  bundleVersion,
-  iconNormal,
-  iconRollover,
-  iconDarkNormal,
-  iconDarkRollover,
-  panelWidth,
-  panelHeight,
-  debugInProduction,
-  lifecycle,
-  cefParams
-}) {
-  const manifestContents = manifestTemplate({
+export function writeExtensionTemplates(opts) {
+  const manifestContents = manifestTemplate(opts)
+  const {
+    out,
+    debugInProduction,
     isDev,
-    bundleName,
-    bundleId,
-    version: bundleVersion,
-    hosts,
-    bundleVersion,
-    iconNormal,
-    iconRollover,
-    iconDarkNormal,
-    iconDarkRollover,
-    panelWidth,
-    panelHeight,
-    lifecycle,
-    cefParams
-  })
+    extensions
+  } = opts
   const manifestDir = path.join(out, 'CSXS')
   const manifestFile = path.join(manifestDir, 'manifest.xml')
   return Promise.resolve()
@@ -192,15 +153,19 @@ export function writeExtensionTemplates({
     .then(() => {
       let chain = Promise.resolve()
       if (debugInProduction || isDev) {
-        const debugContents = debugTemplate(bundleId, debugPorts)
+        const debugContents = debugTemplate(opts)
         chain = chain.then(() => fs.writeFile(path.join(out, '.debug'), debugContents))
       }
-      const href = !isDev ? htmlFilename : `http://${devHost}:${devPort}`
-      const panelContents = panelTemplate({
-        title: bundleName,
-        href
-      })
-      chain = chain.then(() => fs.writeFile(path.join(out, 'panel.html'), panelContents))
+      if (isDev) {
+        extensions.forEach(extension => {
+          const href = `http://${extension.devHost}:${extension.devPort}`
+          const panelContents = panelTemplate({
+            title: extension.name,
+            href
+          })
+          chain = chain.then(() => fs.writeFile(path.join(out, `dev.${extension.id}.html`), panelContents))
+        })
+      }
       return chain
     })
 }
@@ -285,12 +250,19 @@ export function copyDependencies({ root, out, pkg }) {
   }, Promise.resolve())
 }
 
-export function copyIcons({ root, out, config }) {
+export function copyIcons({
+  root,
+  out,
+  iconNormal,
+  iconRollover,
+  iconDarkNormal,
+  iconDarkRollover
+}) {
   const iconPaths = [
-    config.iconNormal,
-    config.iconRollover,
-    config.iconDarkNormal,
-    config.iconDarkRollover,
+    iconNormal,
+    iconRollover,
+    iconDarkNormal,
+    iconDarkRollover,
   ]
     .filter(icon => icon !== undefined)
     .map(icon => ({
@@ -309,52 +281,86 @@ export function copyIcons({ root, out, config }) {
   )
 }
 
+function mergeExtensionDefaults(extension) {
+  return {
+    panelWidth: 500,
+    panelHeight: 500,
+    htmlFilename: 'index.html',
+    devPort: 8080,
+    devHost: 'localhost',
+    lifecycle: {
+      autoVisible: true,
+      startOnEvents: []
+    },
+    cefParams: [
+      '--allow-file-access-from-files',
+      '--allow-file-access',
+      '--enable-nodejs',
+      '--mixed-context'
+    ],
+    debugPorts: {
+      PHXS: 3001,
+      IDSN: 3002,
+      AICY: 3003,
+      ILST: 3004,
+      PPRO: 3005,
+      PRLD: 3006,
+      AEFT: 3007,
+      FLPR: 3008,
+      AUDT: 3009,
+      DRWV: 3010,
+      MUST: 3011,
+      KBRG: 3012,
+    },
+    ...extension
+  }
+}
+
 export function compile(opts) {
   opts.env = opts.env ? opts.env : process.env.NODE_ENV
   opts.root = opts.root ? opts.root : process.cwd()
   opts.htmlFilename = opts.htmlFilename ? opts.htmlFilename : 'index.html'
   opts.pkg = opts.pkg ? opts.pkg : require(path.join(opts.root, '/package.json'))
   opts.devHost = opts.devHost ? opts.devHost : 'localhost'
-  opts.hasOwnProperty('isDev') ? opts.isDev : true
+  opts.devPort = opts.devPort ? opts.devPort : 8080
+  opts.isDev = opts.hasOwnProperty('isDev') ? opts.isDev : false
   const config = getConfig(opts.pkg, opts.env)
   const hosts = parseHosts(config.hosts)
+  const allOpts = {
+      ...opts,
+      ...config,
+      hosts,
+  }
+  let extensions = []
+  if (Array.isArray(config.extensions)) {
+    extensions = config.extensions.map(extension =>
+      mergeExtensionDefaults(extension)
+    )
+  } else {
+    extensions.push({
+      id: allOpts.bundleId,
+      name: allOpts.bundleName,
+      ...allOpts
+    })
+  }
+  allOpts.extensions = extensions
+
   let chain = Promise.resolve()
   if (opts.isDev) {
     enablePlayerDebugMode()
     if (!config.noSymlink) {
       chain = chain.then(() =>
-        symlinkExtension({ bundleId: config.bundleId, out: opts.out })
+        symlinkExtension(allOpts)
       )
     }
   }
   chain = chain.then(() =>
-    copyDependencies({ root: opts.root, out: opts.out, pkg: opts.pkg })
+    copyDependencies(allOpts)
   ).then(() =>
-    writeExtensionTemplates({
-      hosts,
-      isDev: opts.isDev,
-      devPort: opts.devPort,
-      devHost: opts.devHost,
-      htmlFilename: opts.htmlFilename,
-      bundleName: config.bundleName,
-      bundleId: config.bundleId,
-      bundleVersion: config.bundleVersion,
-      iconNormal: config.iconNormal,
-      iconRollover: config.iconRollover,
-      iconDarkNormal: config.iconDarkNormal,
-      iconDarkRollover: config.iconDarkRollover,
-      panelWidth: config.panelWidth,
-      panelHeight: config.panelHeight,
-      debugPorts: config.debugPorts,
-      debugInProduction: config.debugInProduction,
-      cefParams: config.cefParams,
-      lifecycle: config.lifecycle,
-      cefParams: config.cefParams,
-      out: opts.out,
-    })
+    writeExtensionTemplates(allOpts)
   )
   .then(() =>
-    copyIcons({ root: opts.root, out: opts.out, config })
+    copyIcons(allOpts)
   )
   return chain
 }

@@ -1,15 +1,15 @@
-export default (bundleId = 'com.test.extension', debugPorts) => {
+export default ({ extensions }) => {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <ExtensionList>
-  <Extension Id="${bundleId}">
-  <HostList>
-    ${Object.keys(debugPorts)
-      .map(
-        (host) =>
-          `<Host Name="${host.trim()}" Port="${debugPorts[host]}" />`
-      )
-      .join('\n    ')}
-  </HostList>
-  </Extension>
+  ${extensions.map(extension => `<Extension Id="${extension.id}">
+    <HostList>
+      ${Object.keys(extension.debugPorts)
+        .map(
+          (host) =>
+            `<Host Name="${host.trim()}" Port="${extension.debugPorts[host]}" />`
+        )
+        .join('\n      ')}
+    </HostList>
+  </Extension>`).join('\n  ')}
 </ExtensionList>`
 }

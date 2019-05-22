@@ -15,7 +15,7 @@ var argv = require('yargs')
     .option('dev', {
         alias: 'd',
         describe: 'Enable development mode',
-        default: true
+        default: false
     })
     .option('dev-port', {
         alias: 'p',

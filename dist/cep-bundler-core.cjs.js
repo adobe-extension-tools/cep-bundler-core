@@ -25,6 +25,25 @@ function _defineProperty(obj, key, value) {
   return obj;
 }
 
+function _objectSpread(target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i] != null ? arguments[i] : {};
+    var ownKeys = Object.keys(source);
+
+    if (typeof Object.getOwnPropertySymbols === 'function') {
+      ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
+        return Object.getOwnPropertyDescriptor(source, sym).enumerable;
+      }));
+    }
+
+    ownKeys.forEach(function (key) {
+      _defineProperty(target, key, source[key]);
+    });
+  }
+
+  return target;
+}
+
 function _slicedToArray(arr, i) {
   return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest();
 }
@@ -63,58 +82,54 @@ function _nonIterableRest() {
   throw new TypeError("Invalid attempt to destructure non-iterable instance");
 }
 
+var sizeTemplate = function sizeTemplate(name, width, height) {
+  return width !== undefined && height !== undefined ? "\n            <".concat(name, ">\n              <Width>").concat(width, "</Width>\n              <Height>").concat(height, "</Height>\n            </").concat(name, ">") : '';
+};
+
 var manifestTemplate = (function (_ref) {
-  var _ref$bundleName = _ref.bundleName,
-      bundleName = _ref$bundleName === void 0 ? 'My Extension' : _ref$bundleName,
-      _ref$bundleId = _ref.bundleId,
-      bundleId = _ref$bundleId === void 0 ? 'com.test.test.extension' : _ref$bundleId,
-      _ref$version = _ref.version,
-      version = _ref$version === void 0 ? '1.0.0' : _ref$version,
+  var isDev = _ref.isDev,
+      bundleName = _ref.bundleName,
+      bundleId = _ref.bundleId,
       hosts = _ref.hosts,
-      _ref$bundleVersion = _ref.bundleVersion,
-      bundleVersion = _ref$bundleVersion === void 0 ? '1.0.0' : _ref$bundleVersion,
-      _ref$cepVersion = _ref.cepVersion,
-      cepVersion = _ref$cepVersion === void 0 ? '6.0' : _ref$cepVersion,
-      _ref$panelWidth = _ref.panelWidth,
-      panelWidth = _ref$panelWidth === void 0 ? '500' : _ref$panelWidth,
-      _ref$panelHeight = _ref.panelHeight,
-      panelHeight = _ref$panelHeight === void 0 ? '500' : _ref$panelHeight,
-      _ref$cefParams = _ref.cefParams,
-      cefParams = _ref$cefParams === void 0 ? ['--allow-file-access-from-files', '--allow-file-access', '--enable-nodejs'] : _ref$cefParams,
-      iconNormal = _ref.iconNormal,
-      iconRollover = _ref.iconRollover,
-      iconDarkNormal = _ref.iconDarkNormal,
-      iconDarkRollover = _ref.iconDarkRollover,
-      lifecycle = _ref.lifecycle;
-  var commandLineParams = cefParams.map(function (cefParam) {
-    return "<Parameter>".concat(cefParam, "</Parameter>");
-  });
-  var icons = [{
-    icon: iconNormal,
-    type: 'Normal'
-  }, {
-    icon: iconRollover,
-    type: 'RollOver'
-  }, {
-    icon: iconDarkNormal,
-    type: 'DarkNormal'
-  }, {
-    icon: iconDarkRollover,
-    type: 'DarkRollOver'
-  }].filter(function (_ref2) {
-    var icon = _ref2.icon;
-    return !!icon;
-  }).map(function (_ref3) {
-    var icon = _ref3.icon,
-        type = _ref3.type;
-    return "<Icon Type=\"".concat(type, "\">").concat(icon, "</Icon>");
-  }).join('\n            ');
-  var startOn = !lifecycle.startOnEvents || lifecycle.startOnEvents.length === 0 ? '' : "\n          <StartOn>\n            ".concat(lifecycle.startOnEvents.map(function (e) {
-    return "<Event>".concat(e, "</Event>");
-  }).join('\n            '), "\n          </StartOn>");
-  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<ExtensionManifest xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" ExtensionBundleId=\"".concat(bundleId, "\" ExtensionBundleName=\"").concat(bundleName, "\" ExtensionBundleVersion=\"").concat(bundleVersion, "\" Version=\"").concat(cepVersion, "\">\n  <ExtensionList>\n    <Extension Id=\"").concat(bundleId, "\" Version=\"").concat(version, "\"/>\n  </ExtensionList>\n  <ExecutionEnvironment>\n    <HostList>\n      ").concat(hosts.map(function (host) {
+      bundleVersion = _ref.bundleVersion,
+      cepVersion = _ref.cepVersion,
+      extensions = _ref.extensions;
+  return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<ExtensionManifest xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" ExtensionBundleId=\"".concat(bundleId, "\" ExtensionBundleName=\"").concat(bundleName, "\" ExtensionBundleVersion=\"").concat(bundleVersion, "\" Version=\"").concat(cepVersion, "\">\n  <ExtensionList>\n    ").concat(extensions.map(function (extension) {
+    return "<Extension Id=\"".concat(extension.id, "\" Version=\"").concat(bundleVersion, "\" />");
+  }).join('\n    '), "\n  </ExtensionList>\n  <ExecutionEnvironment>\n    <HostList>\n      ").concat(hosts.map(function (host) {
     return "<Host Name=\"".concat(host.name, "\" Version=\"").concat(host.version, "\" />");
-  }).join('\n      '), "\n    </HostList>\n    <LocaleList>\n      <Locale Code=\"All\"/>\n    </LocaleList>\n    <RequiredRuntimeList>\n      <RequiredRuntime Name=\"CSXS\" Version=\"").concat(cepVersion, "\"/>\n    </RequiredRuntimeList>\n  </ExecutionEnvironment>\n  <DispatchInfoList>\n    <Extension Id=\"").concat(bundleId, "\">\n      <DispatchInfo>\n        <Resources>\n          <MainPath>./panel.html</MainPath>\n          <CEFCommandLine>\n            ").concat(commandLineParams.join('\n            '), "\n          </CEFCommandLine>\n        </Resources>\n        <Lifecycle>\n          <AutoVisible>").concat(lifecycle.autoVisible, "</AutoVisible>").concat(startOn, "\n        </Lifecycle>\n        <UI>\n          <Type>Panel</Type>\n          <Menu>").concat(bundleName, "</Menu>\n          <Geometry>\n            <Size>\n              <Width>").concat(panelWidth, "</Width>\n              <Height>").concat(panelHeight, "</Height>\n            </Size>\n          </Geometry>\n          <Icons>\n            ").concat(icons, "\n          </Icons>\n        </UI>\n      </DispatchInfo>\n    </Extension>\n  </DispatchInfoList>\n</ExtensionManifest>");
+  }).join('\n      '), "\n    </HostList>\n    <LocaleList>\n      <Locale Code=\"All\"/>\n    </LocaleList>\n    <RequiredRuntimeList>\n      <RequiredRuntime Name=\"CSXS\" Version=\"").concat(cepVersion, "\" />\n    </RequiredRuntimeList>\n  </ExecutionEnvironment>\n  <DispatchInfoList>\n    ").concat(extensions.map(function (extension) {
+    var commandLineParams = extension.cefParams.map(function (cefParam) {
+      return "<Parameter>".concat(cefParam, "</Parameter>");
+    });
+    var icons = [{
+      icon: extension.iconNormal,
+      type: 'Normal'
+    }, {
+      icon: extension.iconRollover,
+      type: 'RollOver'
+    }, {
+      icon: extension.iconDarkNormal,
+      type: 'DarkNormal'
+    }, {
+      icon: extension.iconDarkRollover,
+      type: 'DarkRollOver'
+    }].filter(function (_ref2) {
+      var icon = _ref2.icon;
+      return !!icon;
+    }).map(function (_ref3) {
+      var icon = _ref3.icon,
+          type = _ref3.type;
+      return "<Icon Type=\"".concat(type, "\">").concat(icon, "</Icon>");
+    }).join('\n            ');
+    var size = sizeTemplate('Size', extension.panelWidth, extension.panelHeight);
+    var minSize = sizeTemplate('MinSize', extension.panelMinWidth, extension.panelMinHeight);
+    var maxSize = sizeTemplate('MaxSize', extension.panelMaxWidth, extension.panelMaxHeight);
+    var startOn = !extension.lifecycle.startOnEvents || extension.lifecycle.startOnEvents.length === 0 ? '' : "\n          <StartOn>\n            ".concat(extension.lifecycle.startOnEvents.map(function (e) {
+      return "<Event>".concat(e, "</Event>");
+    }).join('\n            '), "\n          </StartOn>");
+    return "<Extension Id=\"".concat(extension.id, "\">\n      <DispatchInfo>\n        <Resources>\n          <MainPath>").concat(isDev ? "./dev.".concat(extension.id, ".html") : extension.htmlFilename, "</MainPath>\n          <CEFCommandLine>\n            ").concat(commandLineParams.join('\n            '), "\n          </CEFCommandLine>\n        </Resources>\n        <Lifecycle>\n          <AutoVisible>").concat(extension.lifecycle.autoVisible, "</AutoVisible>").concat(startOn, "\n        </Lifecycle>\n        <UI>\n          <Type>").concat(extension.type || 'Panel', "</Type>\n          ").concat(extension.menu === false ? '' : "<Menu>".concat(extension.name, "</Menu>"), "\n          <Geometry>").concat(size).concat(minSize).concat(maxSize, "\n          </Geometry>").concat(icons ? "\n          <Icons>".concat(icons, "</Icons>") : '', "\n        </UI>\n      </DispatchInfo>\n    </Extension>");
+  }).join('\n    '), "\n  </DispatchInfoList>\n</ExtensionManifest>");
 });
 
 var panelTemplate = (function (_ref) {
@@ -124,12 +139,13 @@ var panelTemplate = (function (_ref) {
   return "<!DOCTYPE html>\n<html>\n  <head>\n    <title>".concat(title, "</title>\n  </head>\n  <body>\n    <script>\n      window.location.href = \"").concat(href, "\";\n    </script>\n  </body>\n</html>");
 });
 
-var debugTemplate = (function () {
-  var bundleId = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'com.test.extension';
-  var debugPorts = arguments.length > 1 ? arguments[1] : undefined;
-  return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<ExtensionList>\n  <Extension Id=\"".concat(bundleId, "\">\n  <HostList>\n    ").concat(Object.keys(debugPorts).map(function (host) {
-    return "<Host Name=\"".concat(host.trim(), "\" Port=\"").concat(debugPorts[host], "\" />");
-  }).join('\n    '), "\n  </HostList>\n  </Extension>\n</ExtensionList>");
+var debugTemplate = (function (_ref) {
+  var extensions = _ref.extensions;
+  return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<ExtensionList>\n  ".concat(extensions.map(function (extension) {
+    return "<Extension Id=\"".concat(extension.id, "\">\n    <HostList>\n      ").concat(Object.keys(extension.debugPorts).map(function (host) {
+      return "<Host Name=\"".concat(host.trim(), "\" Port=\"").concat(extension.debugPorts[host], "\" />");
+    }).join('\n      '), "\n    </HostList>\n  </Extension>");
+  }).join('\n  '), "\n</ExtensionList>");
 });
 
 function templateDebug(formatter) {
@@ -175,11 +191,12 @@ function getConfig(pkg, env) {
   var debugPortEnvs = Object.keys(process.env).filter(function (key) {
     return key.indexOf('CEP_DEBUG_PORT_') === 0;
   });
-  var pkgConfig = pkg.hasOwnProperty('cep') ? pkg.cep.hasOwnProperty(env) ? pkg.cep.env : pkg.cep : {};
+  var pkgConfig = pkg.hasOwnProperty('cep') ? pkg.cep.hasOwnProperty(env) ? pkg.cep[env] : pkg.cep : {};
   var config = lodash.defaultsDeep({
     bundleName: process.env.CEP_NAME,
     bundleId: process.env.CEP_ID,
     bundleVersion: process.env.CEP_VERSION,
+    cepVersion: process.env.CEP_CEP_VERSION,
     hosts: process.env.CEP_HOSTS,
     iconNormal: process.env.CEP_ICON_NORMAL,
     iconRollover: process.env.CEP_ICON_ROLLOVER,
@@ -187,6 +204,10 @@ function getConfig(pkg, env) {
     iconDarkRollover: process.env.CEP_ICON_DARK_ROLLOVER,
     panelWidth: process.env.CEP_PANEL_WIDTH,
     panelHeight: process.env.CEP_PANEL_HEIGHT,
+    panelMinWidth: process.env.CEP_PANEL_MIN_WIDTH,
+    panelMinHeight: process.env.CEP_PANEL_MIN_HEIGHT,
+    panelMaxWidth: process.env.CEP_PANEL_MAX_WIDTH,
+    panelMaxHeight: process.env.CEP_PANEL_MAX_HEIGHT,
     debugPorts: debugPortEnvs.length > 0 ? debugPortEnvs.reduce(function (obj, key) {
       obj[key] = parseInt(process.env[key], 10);
       return obj;
@@ -197,6 +218,7 @@ function getConfig(pkg, env) {
     bundleName: pkgConfig.name,
     bundleId: pkgConfig.id,
     bundleVersion: pkgConfig.version,
+    cepVersion: pkgConfig.cepVersion,
     hosts: pkgConfig.hosts,
     iconNormal: pkgConfig.iconNormal,
     iconRollover: pkgConfig.iconRollover,
@@ -204,86 +226,41 @@ function getConfig(pkg, env) {
     iconDarkRollover: pkgConfig.iconDarkRollover,
     panelWidth: pkgConfig.panelWidth,
     panelHeight: pkgConfig.panelHeight,
+    panelMinWidth: pkgConfig.panelMinWidth,
+    panelMinHeight: pkgConfig.panelMinHeight,
+    panelMaxWidth: pkgConfig.panelMaxWidth,
+    panelMaxHeight: pkgConfig.panelMaxHeight,
     debugPorts: pkgConfig.debugPorts,
     debugInProduction: pkgConfig.debugInProduction,
     lifecycle: pkgConfig.lifecycle,
-    cefParams: pkgConfig.cefParams
+    cefParams: pkgConfig.cefParams,
+    extensions: pkgConfig.extensions
   }, {
     bundleVersion: pkg.version
-  }, {
-    bundleName: 'Parcel CEP Extension',
+  }, _objectSpread({}, mergeExtensionDefaults({}), {
+    bundleName: 'CEP Extension',
     bundleId: 'com.mycompany.myextension',
     bundleVersion: '0.0.1',
     hosts: '*',
-    panelWidth: 500,
-    panelHeight: 500,
     debugInProduction: false,
-    debugPorts: {
-      PHXS: 3001,
-      IDSN: 3002,
-      AICY: 3003,
-      ILST: 3004,
-      PPRO: 3005,
-      PRLD: 3006,
-      AEFT: 3007,
-      FLPR: 3008,
-      AUDT: 3009,
-      DRWV: 3010,
-      MUST: 3011,
-      KBRG: 3012
-    },
-    lifecycle: {
-      autoVisible: true,
-      startOnEvents: []
-    },
-    cefParams: ['--allow-file-access-from-files', '--allow-file-access', '--enable-nodejs', '--mixed-context']
-  });
+    cepVersion: '6.0'
+  }));
   return config;
 }
-function objectToProcessEnv(object) {
+function objectToProcessEnv(obj) {
   // assign object to process.env so they can be used in the code
-  Object.keys(object).forEach(function (key) {
+  Object.keys(obj).forEach(function (key) {
     var envKey = camelToSnake(key).toUpperCase();
-    var value = typeof object[key] === 'string' ? object[key] : JSON.stringify(object[key]);
+    var value = typeof obj[key] === 'string' ? obj[key] : JSON.stringify(obj[key]);
     process.env[envKey] = value;
   });
 }
-function writeExtensionTemplates(_ref) {
-  var isDev = _ref.isDev,
-      devPort = _ref.devPort,
-      devHost = _ref.devHost,
-      hosts = _ref.hosts,
-      debugPorts = _ref.debugPorts,
-      out = _ref.out,
-      htmlFilename = _ref.htmlFilename,
-      bundleName = _ref.bundleName,
-      bundleId = _ref.bundleId,
-      bundleVersion = _ref.bundleVersion,
-      iconNormal = _ref.iconNormal,
-      iconRollover = _ref.iconRollover,
-      iconDarkNormal = _ref.iconDarkNormal,
-      iconDarkRollover = _ref.iconDarkRollover,
-      panelWidth = _ref.panelWidth,
-      panelHeight = _ref.panelHeight,
-      debugInProduction = _ref.debugInProduction,
-      lifecycle = _ref.lifecycle,
-      cefParams = _ref.cefParams;
-  var manifestContents = manifestTemplate({
-    isDev: isDev,
-    bundleName: bundleName,
-    bundleId: bundleId,
-    version: bundleVersion,
-    hosts: hosts,
-    bundleVersion: bundleVersion,
-    iconNormal: iconNormal,
-    iconRollover: iconRollover,
-    iconDarkNormal: iconDarkNormal,
-    iconDarkRollover: iconDarkRollover,
-    panelWidth: panelWidth,
-    panelHeight: panelHeight,
-    lifecycle: lifecycle,
-    cefParams: cefParams
-  });
+function writeExtensionTemplates(opts) {
+  var manifestContents = manifestTemplate(opts);
+  var out = opts.out,
+      debugInProduction = opts.debugInProduction,
+      isDev = opts.isDev,
+      extensions = opts.extensions;
   var manifestDir = path.join(out, 'CSXS');
   var manifestFile = path.join(manifestDir, 'manifest.xml');
   return Promise.resolve().then(function () {
@@ -294,20 +271,25 @@ function writeExtensionTemplates(_ref) {
     var chain = Promise.resolve();
 
     if (debugInProduction || isDev) {
-      var debugContents = debugTemplate(bundleId, debugPorts);
+      var debugContents = debugTemplate(opts);
       chain = chain.then(function () {
         return fs.writeFile(path.join(out, '.debug'), debugContents);
       });
     }
 
-    var href = !isDev ? htmlFilename : "http://".concat(devHost, ":").concat(devPort);
-    var panelContents = panelTemplate({
-      title: bundleName,
-      href: href
-    });
-    chain = chain.then(function () {
-      return fs.writeFile(path.join(out, 'panel.html'), panelContents);
-    });
+    if (isDev) {
+      extensions.forEach(function (extension) {
+        var href = "http://".concat(extension.devHost, ":").concat(extension.devPort);
+        var panelContents = panelTemplate({
+          title: extension.name,
+          href: href
+        });
+        chain = chain.then(function () {
+          return fs.writeFile(path.join(out, "dev.".concat(extension.id, ".html")), panelContents);
+        });
+      });
+    }
+
     return chain;
   });
 }
@@ -342,15 +324,15 @@ function getExtenstionPath() {
   }
 }
 
-function getSymlinkExtensionPath(_ref2) {
-  var bundleId = _ref2.bundleId;
+function getSymlinkExtensionPath(_ref) {
+  var bundleId = _ref.bundleId;
   var extensionPath = getExtenstionPath();
   return path.join(extensionPath, bundleId);
 }
 
-function symlinkExtension(_ref3) {
-  var bundleId = _ref3.bundleId,
-      out = _ref3.out;
+function symlinkExtension(_ref2) {
+  var bundleId = _ref2.bundleId,
+      out = _ref2.out;
   var target = getSymlinkExtensionPath({
     bundleId: bundleId
   });
@@ -366,10 +348,10 @@ function symlinkExtension(_ref3) {
     }
   });
 }
-function copyDependencies(_ref4) {
-  var root = _ref4.root,
-      out = _ref4.out,
-      pkg = _ref4.pkg;
+function copyDependencies(_ref3) {
+  var root = _ref3.root,
+      out = _ref3.out,
+      pkg = _ref3.pkg;
   var deps = pkg.dependencies || {};
   return Object.keys(deps).reduce(function (chain, dep) {
     var src = path.join(root, 'node_modules', dep);
@@ -398,11 +380,14 @@ function copyDependencies(_ref4) {
     return chain;
   }, Promise.resolve());
 }
-function copyIcons(_ref5) {
-  var root = _ref5.root,
-      out = _ref5.out,
-      config = _ref5.config;
-  var iconPaths = [config.iconNormal, config.iconRollover, config.iconDarkNormal, config.iconDarkRollover].filter(function (icon) {
+function copyIcons(_ref4) {
+  var root = _ref4.root,
+      out = _ref4.out,
+      iconNormal = _ref4.iconNormal,
+      iconRollover = _ref4.iconRollover,
+      iconDarkNormal = _ref4.iconDarkNormal,
+      iconDarkRollover = _ref4.iconDarkRollover;
+  var iconPaths = [iconNormal, iconRollover, iconDarkNormal, iconDarkRollover].filter(function (icon) {
     return icon !== undefined;
   }).map(function (icon) {
     return {
@@ -416,15 +401,65 @@ function copyIcons(_ref5) {
     });
   }));
 }
+
+function mergeExtensionDefaults(extension) {
+  return _objectSpread({
+    panelWidth: 500,
+    panelHeight: 500,
+    htmlFilename: 'index.html',
+    devPort: 8080,
+    devHost: 'localhost',
+    lifecycle: {
+      autoVisible: true,
+      startOnEvents: []
+    },
+    cefParams: ['--allow-file-access-from-files', '--allow-file-access', '--enable-nodejs', '--mixed-context'],
+    debugPorts: {
+      PHXS: 3001,
+      IDSN: 3002,
+      AICY: 3003,
+      ILST: 3004,
+      PPRO: 3005,
+      PRLD: 3006,
+      AEFT: 3007,
+      FLPR: 3008,
+      AUDT: 3009,
+      DRWV: 3010,
+      MUST: 3011,
+      KBRG: 3012
+    }
+  }, extension);
+}
+
 function compile(opts) {
   opts.env = opts.env ? opts.env : process.env.NODE_ENV;
   opts.root = opts.root ? opts.root : process.cwd();
   opts.htmlFilename = opts.htmlFilename ? opts.htmlFilename : 'index.html';
   opts.pkg = opts.pkg ? opts.pkg : require(path.join(opts.root, '/package.json'));
   opts.devHost = opts.devHost ? opts.devHost : 'localhost';
-  opts.hasOwnProperty('isDev') ? opts.isDev : true;
+  opts.devPort = opts.devPort ? opts.devPort : 8080;
+  opts.isDev = opts.hasOwnProperty('isDev') ? opts.isDev : false;
   var config = getConfig(opts.pkg, opts.env);
   var hosts = parseHosts(config.hosts);
+
+  var allOpts = _objectSpread({}, opts, config, {
+    hosts: hosts
+  });
+
+  var extensions = [];
+
+  if (Array.isArray(config.extensions)) {
+    extensions = config.extensions.map(function (extension) {
+      return mergeExtensionDefaults(extension);
+    });
+  } else {
+    extensions.push(_objectSpread({
+      id: allOpts.bundleId,
+      name: allOpts.bundleName
+    }, allOpts));
+  }
+
+  allOpts.extensions = extensions;
   var chain = Promise.resolve();
 
   if (opts.isDev) {
@@ -432,49 +467,17 @@ function compile(opts) {
 
     if (!config.noSymlink) {
       chain = chain.then(function () {
-        return symlinkExtension({
-          bundleId: config.bundleId,
-          out: opts.out
-        });
+        return symlinkExtension(allOpts);
       });
     }
   }
 
   chain = chain.then(function () {
-    return copyDependencies({
-      root: opts.root,
-      out: opts.out,
-      pkg: opts.pkg
-    });
+    return copyDependencies(allOpts);
   }).then(function () {
-    var _writeExtensionTempla;
-
-    return writeExtensionTemplates((_writeExtensionTempla = {
-      hosts: hosts,
-      isDev: opts.isDev,
-      devPort: opts.devPort,
-      devHost: opts.devHost,
-      htmlFilename: opts.htmlFilename,
-      bundleName: config.bundleName,
-      bundleId: config.bundleId,
-      bundleVersion: config.bundleVersion,
-      iconNormal: config.iconNormal,
-      iconRollover: config.iconRollover,
-      iconDarkNormal: config.iconDarkNormal,
-      iconDarkRollover: config.iconDarkRollover,
-      panelWidth: config.panelWidth,
-      panelHeight: config.panelHeight,
-      debugPorts: config.debugPorts,
-      debugInProduction: config.debugInProduction,
-      cefParams: config.cefParams,
-      lifecycle: config.lifecycle
-    }, _defineProperty(_writeExtensionTempla, "cefParams", config.cefParams), _defineProperty(_writeExtensionTempla, "out", opts.out), _writeExtensionTempla));
+    return writeExtensionTemplates(allOpts);
   }).then(function () {
-    return copyIcons({
-      root: opts.root,
-      out: opts.out,
-      config: config
-    });
+    return copyIcons(allOpts);
   });
   return chain;
 }

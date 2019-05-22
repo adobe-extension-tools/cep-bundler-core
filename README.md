@@ -8,18 +8,66 @@ const core = require('cep-bundler-core')
 
 core.compile({
   out: '/path/to/dist',          // REQUIRED type: string
-  devPort: 8080,                 // REQUIRED type: number
+  isDev: false,                  // OPTIONAL type: boolean, default: false
+  devPort: 8080,                 // OPTIONAL type: number, default: 8080
   devHost: 'localhost',          // OPTIONAL type: string, default: localhost
   env: 'production',             // OPTIONAL type: string, default: process.env.NODE_ENV
   root: '/path/to/project/root', // OPTIONAL type: string, default: process.cwd()
-  htmlFilename: 'index.html',    // OPTIONAL type: string, default: 'index.html'
+  htmlFilename: './index.html',  // OPTIONAL type: string, default: 'index.html'
   pkg: require('./package.json') // OPTIONAL type: object, default: require(opts.root + '/package.json')
 })
 ```
 
+### out
+
+The `out` option specifies where the `manifest.xml`, `dev.html`, `node_modules` folder and (optionally) `.debug` file are saved to, this is usually the folder where your compiled javascript ends up.
+
+### isDev
+
+When `isDev` is true, the bundler will create a `dev.html` file that contains a redirect to `http://${devHost}:${devPort}`, when `isDev` is false, it will not create a dev.html file but will set the `MainPath` in the `manifest.xml` to the value set through the `htmlFilename` option.
+
+### devPort & devHost
+
+See the `isDev` option above, these options are used to specify where your bundler dev server is running, when compiling with `isDev` set to true, a html file will be created that will redirect to your dev server.
+
+### env
+
+The `env` option is used when you want different configurations for other environments, you might for example have `development`, `staging`, `ci` and `production` environments that you want to configure differently.
+This option is only used when configure the bundler through your `package.json`, here is an example of using different extension names for different environments.
+
+```json
+"cep": {
+    "development": {
+        "name": "My Extension DEVELOPMENT",
+        "id": "com.mycompany.myextension.development",
+    },
+    "beta": {
+        "name": "My Extension BETA",
+        "id": "com.mycompany.myextension.beta",
+    },
+    "production": {
+        "name": "My Extension",
+        "id": "com.mycompany.myextension",
+    }
+}
+```
+
+### root
+
+The `root` option determines where the bundler should look for the `package.json` and `node_modules` folder, when you leave this off the current working directory will be used.
+
+### htmlFilename
+
+The htmlFilename is the name of your html file, this option is only used when `isDev` is false.
+This path is relative from the `out` folder.
+
+### pkg
+
+Optionally pass in the package.json object yourself, it will load the json from the `package.json` in the `root` folder by default.
+
 ## CEP Configuration
 
-You can configure CEP a either through environment variables or the `package.json` of your project.
+You can configure CEP a either through environment variables or by a config object under the `cep` key in the `package.json` of your project.
 
 ### package.json
 
@@ -102,10 +150,10 @@ To add a custom panel icon, add all [icon files](https://github.com/Adobe-CEP/CE
 
 Environment variables:
 ```bash
-ICON_NORMAL="./assets/icon-normal.png",
-ICON_ROLLOVER="./assets/icon-rollover.png",
-ICON_DARK_NORMAL="./assets/icon-dark.png",
-ICON_DARK_ROLLOVER="./assets/icon-dark-rollover.png"
+CEP_ICON_NORMAL="./assets/icon-normal.png",
+CEP_ICON_ROLLOVER="./assets/icon-rollover.png",
+CEP_ICON_DARK_NORMAL="./assets/icon-dark.png",
+CEP_ICON_DARK_ROLLOVER="./assets/icon-dark-rollover.png"
 ```
 
 #### Panel Size
@@ -117,8 +165,34 @@ ICON_DARK_ROLLOVER="./assets/icon-dark-rollover.png"
 
 Environment variables:
 ```bash
-PANEL_WIDTH=500
-PANEL_HEIGHT=500
+CEP_PANEL_WIDTH=500
+CEP_PANEL_HEIGHT=500
+```
+
+#### Panel Minimum Size
+
+```json
+"panelMinWidth": 500,
+"panelMinHeight": 500,
+```
+
+Environment variables:
+```bash
+CEP_PANEL_MIN_WIDTH=500
+CEP_PANEL_MIN_HEIGHT=500
+```
+
+#### Panel Maximum Size
+
+```json
+"panelMaxWidth": 500,
+"panelMaxHeight": 500,
+```
+
+Environment variables:
+```bash
+CEP_PANEL_MAX_WIDTH=500
+CEP_PANEL_MAX_HEIGHT=500
 ```
 
 #### Debug ports
@@ -180,5 +254,9 @@ CEP_DEBUG_IN_PRODUCTION="1"
 ```
 Environment variable:
 ```bash
-CEP_CEF_PARAMS="--allow-file-access-from-files,--allow-file-access,--enable-nodejs"
+CEP_CEF_PARAMS="--allow-file-access-from-files,--allow-file-access,--enable-nodejs,--mixed-context"
 ```
+
+## Credits
+
+This code is mostly taken from (an old version of) [parcel-plugin-cep](https://github.com/fusepilot/parcel-plugin-cep) by [@fusepilot](https://github.com/fusepilot).
