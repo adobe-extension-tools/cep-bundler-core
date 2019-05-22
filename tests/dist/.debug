@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ExtensionList>
+  <Extension Id="com.myextension">
+    <HostList>
+      <Host Name="PHXS" Port="3001" />
+      <Host Name="IDSN" Port="3002" />
+      <Host Name="AICY" Port="3003" />
+      <Host Name="ILST" Port="3004" />
+      <Host Name="PPRO" Port="3005" />
+      <Host Name="PRLD" Port="3006" />
+      <Host Name="AEFT" Port="3007" />
+      <Host Name="FLPR" Port="3008" />
+      <Host Name="AUDT" Port="3009" />
+      <Host Name="DRWV" Port="3010" />
+      <Host Name="MUST" Port="3011" />
+      <Host Name="KBRG" Port="3012" />
+    </HostList>
+  </Extension>
+</ExtensionList>
