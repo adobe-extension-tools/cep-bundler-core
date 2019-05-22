@@ -245,6 +245,20 @@ function getConfig(pkg, env) {
     debugInProduction: false,
     cepVersion: '6.0'
   }));
+  var extensions = [];
+
+  if (Array.isArray(config.extensions)) {
+    extensions = config.extensions.map(function (extension) {
+      return mergeExtensionDefaults(extension);
+    });
+  } else {
+    extensions.push(_objectSpread({
+      id: config.bundleId,
+      name: config.bundleName
+    }, config));
+  }
+
+  config.extensions = extensions;
   return config;
 }
 function objectToProcessEnv(obj) {
@@ -446,20 +460,6 @@ function compile(opts) {
     hosts: hosts
   });
 
-  var extensions = [];
-
-  if (Array.isArray(config.extensions)) {
-    extensions = config.extensions.map(function (extension) {
-      return mergeExtensionDefaults(extension);
-    });
-  } else {
-    extensions.push(_objectSpread({
-      id: allOpts.bundleId,
-      name: allOpts.bundleName
-    }, allOpts));
-  }
-
-  allOpts.extensions = extensions;
   var chain = Promise.resolve();
 
   if (opts.isDev) {

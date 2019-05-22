@@ -123,6 +123,19 @@ export function getConfig(pkg, env) {
       cepVersion: '6.0'
     }
   )
+  let extensions = []
+  if (Array.isArray(config.extensions)) {
+    extensions = config.extensions.map(extension =>
+      mergeExtensionDefaults(extension)
+    )
+  } else {
+    extensions.push({
+      id: config.bundleId,
+      name: config.bundleName,
+      ...config
+    })
+  }
+  config.extensions = extensions
   return config
 }
 
@@ -331,20 +344,6 @@ export function compile(opts) {
       ...config,
       hosts,
   }
-  let extensions = []
-  if (Array.isArray(config.extensions)) {
-    extensions = config.extensions.map(extension =>
-      mergeExtensionDefaults(extension)
-    )
-  } else {
-    extensions.push({
-      id: allOpts.bundleId,
-      name: allOpts.bundleName,
-      ...allOpts
-    })
-  }
-  allOpts.extensions = extensions
-
   let chain = Promise.resolve()
   if (opts.isDev) {
     enablePlayerDebugMode()

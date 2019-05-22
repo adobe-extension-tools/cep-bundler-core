@@ -29,7 +29,7 @@
     <Extension Id="com.myextension">
       <DispatchInfo>
         <Resources>
-          <MainPath>./dev.com.myextension.html</MainPath>
+          <MainPath>index.html</MainPath>
           <CEFCommandLine>
             <Parameter>--allow-file-access-from-files</Parameter>
             <Parameter>--allow-file-access</Parameter>
