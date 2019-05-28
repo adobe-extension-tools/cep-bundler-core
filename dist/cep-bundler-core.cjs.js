@@ -187,12 +187,11 @@ function isTruthy(str) {
   return typeof str === 'string' && (str === '1' || str.toLowerCase() === 'true');
 }
 
-function getConfig(pkg, env) {
+function getEnvConfig() {
   var debugPortEnvs = Object.keys(process.env).filter(function (key) {
     return key.indexOf('CEP_DEBUG_PORT_') === 0;
   });
-  var pkgConfig = pkg.hasOwnProperty('cep') ? pkg.cep.hasOwnProperty(env) ? pkg.cep[env] : pkg.cep : {};
-  var config = lodash.defaultsDeep({
+  return {
     bundleName: process.env.CEP_NAME,
     bundleId: process.env.CEP_ID,
     bundleVersion: process.env.CEP_VERSION,
@@ -214,7 +213,12 @@ function getConfig(pkg, env) {
     }, {}) : undefined,
     debugInProduction: isTruthy(process.env.CEP_DEBUG_IN_PRODUCTION) || undefined,
     cefParams: !process.env.CEP_CEF_PARAMS ? undefined : process.env.CEP_CEF_PARAMS.split(',')
-  }, {
+  };
+}
+
+function getPkgConfig(pkg, env) {
+  var pkgConfig = pkg.hasOwnProperty('cep') ? pkg.cep.hasOwnProperty(env) ? pkg.cep[env] : pkg.cep : {};
+  return {
     bundleName: pkgConfig.name,
     bundleId: pkgConfig.id,
     bundleVersion: pkgConfig.version,
@@ -235,21 +239,30 @@ function getConfig(pkg, env) {
     lifecycle: pkgConfig.lifecycle,
     cefParams: pkgConfig.cefParams,
     extensions: pkgConfig.extensions
-  }, {
-    bundleVersion: pkg.version
-  }, _objectSpread({}, mergeExtensionDefaults({}), {
+  };
+}
+
+function getConfigDefaults() {
+  return _objectSpread({}, getExtensionDefaults(), {
     bundleName: 'CEP Extension',
     bundleId: 'com.mycompany.myextension',
     bundleVersion: '0.0.1',
     hosts: '*',
     debugInProduction: false,
     cepVersion: '6.0'
-  }));
+  });
+}
+
+function getConfig(pkg, env) {
+  var config = lodash.defaults(getEnvConfig(), getPkgConfig(pkg, env), getConfigDefaults());
+  config.hosts = parseHosts(config.hosts);
   var extensions = [];
 
   if (Array.isArray(config.extensions)) {
     extensions = config.extensions.map(function (extension) {
-      return mergeExtensionDefaults(extension);
+      return _objectSpread({}, getExtensionDefaults(), {
+        extension: extension
+      });
     });
   } else {
     extensions.push(_objectSpread({
@@ -416,8 +429,8 @@ function copyIcons(_ref4) {
   }));
 }
 
-function mergeExtensionDefaults(extension) {
-  return _objectSpread({
+function getExtensionDefaults() {
+  return {
     panelWidth: 500,
     panelHeight: 500,
     htmlFilename: 'index.html',
@@ -442,7 +455,7 @@ function mergeExtensionDefaults(extension) {
       MUST: 3011,
       KBRG: 3012
     }
-  }, extension);
+  };
 }
 
 function compile(opts) {
@@ -454,11 +467,8 @@ function compile(opts) {
   opts.devPort = opts.devPort ? opts.devPort : 8080;
   opts.isDev = opts.hasOwnProperty('isDev') ? opts.isDev : false;
   var config = getConfig(opts.pkg, opts.env);
-  var hosts = parseHosts(config.hosts);
 
-  var allOpts = _objectSpread({}, opts, config, {
-    hosts: hosts
-  });
+  var allOpts = _objectSpread({}, opts, config);
 
   var chain = Promise.resolve();
 

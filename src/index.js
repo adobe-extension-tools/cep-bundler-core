@@ -2,7 +2,7 @@ import os from 'os'
 import path from 'path'
 import { execSync } from 'child_process'
 import fs from 'fs-extra'
-import { range, defaultsDeep } from 'lodash'
+import { range, defaults } from 'lodash'
 
 import manifestTemplate from './templates/manifest'
 import panelTemplate from './templates/html'
@@ -52,82 +52,95 @@ function isTruthy(str) {
   return typeof str === 'string' && (str === '1' || str.toLowerCase() === 'true')
 }
 
-export function getConfig(pkg, env) {
+function getEnvConfig() {
   const debugPortEnvs = Object.keys(process.env)
     .filter((key) => key.indexOf('CEP_DEBUG_PORT_') === 0)
+  return {
+    bundleName: process.env.CEP_NAME,
+    bundleId: process.env.CEP_ID,
+    bundleVersion: process.env.CEP_VERSION,
+    cepVersion: process.env.CEP_CEP_VERSION,
+    hosts: process.env.CEP_HOSTS,
+    iconNormal: process.env.CEP_ICON_NORMAL,
+    iconRollover: process.env.CEP_ICON_ROLLOVER,
+    iconDarkNormal: process.env.CEP_ICON_DARK_NORMAL,
+    iconDarkRollover: process.env.CEP_ICON_DARK_ROLLOVER,
+    panelWidth: process.env.CEP_PANEL_WIDTH,
+    panelHeight: process.env.CEP_PANEL_HEIGHT,
+    panelMinWidth: process.env.CEP_PANEL_MIN_WIDTH,
+    panelMinHeight: process.env.CEP_PANEL_MIN_HEIGHT,
+    panelMaxWidth: process.env.CEP_PANEL_MAX_WIDTH,
+    panelMaxHeight: process.env.CEP_PANEL_MAX_HEIGHT,
+    debugPorts: debugPortEnvs.length > 0
+      ? debugPortEnvs.reduce((obj, key) => {
+        obj[key] = parseInt(process.env[key], 10)
+        return obj
+      }, {})
+      : undefined,
+    debugInProduction: isTruthy(process.env.CEP_DEBUG_IN_PRODUCTION) || undefined,
+    cefParams: !process.env.CEP_CEF_PARAMS ? undefined : process.env.CEP_CEF_PARAMS.split(',')
+  }
+}
+
+function getPkgConfig(pkg, env) {
   const pkgConfig = pkg.hasOwnProperty('cep')
     ? (
       pkg.cep.hasOwnProperty(env)
         ? pkg.cep[env]
         : pkg.cep
-      )
+    )
     : {}
-  const config = defaultsDeep(
-    {
-      bundleName: process.env.CEP_NAME,
-      bundleId: process.env.CEP_ID,
-      bundleVersion: process.env.CEP_VERSION,
-      cepVersion: process.env.CEP_CEP_VERSION,
-      hosts: process.env.CEP_HOSTS,
-      iconNormal: process.env.CEP_ICON_NORMAL,
-      iconRollover: process.env.CEP_ICON_ROLLOVER,
-      iconDarkNormal: process.env.CEP_ICON_DARK_NORMAL,
-      iconDarkRollover: process.env.CEP_ICON_DARK_ROLLOVER,
-      panelWidth: process.env.CEP_PANEL_WIDTH,
-      panelHeight: process.env.CEP_PANEL_HEIGHT,
-      panelMinWidth: process.env.CEP_PANEL_MIN_WIDTH,
-      panelMinHeight: process.env.CEP_PANEL_MIN_HEIGHT,
-      panelMaxWidth: process.env.CEP_PANEL_MAX_WIDTH,
-      panelMaxHeight: process.env.CEP_PANEL_MAX_HEIGHT,
-      debugPorts: debugPortEnvs.length > 0
-        ? debugPortEnvs.reduce((obj, key) => {
-          obj[key] = parseInt(process.env[key], 10)
-          return obj
-        }, {})
-        : undefined,
-      debugInProduction: isTruthy(process.env.CEP_DEBUG_IN_PRODUCTION) || undefined,
-      cefParams: !process.env.CEP_CEF_PARAMS ? undefined : process.env.CEP_CEF_PARAMS.split(',')
-    },
-    {
-      bundleName: pkgConfig.name,
-      bundleId: pkgConfig.id,
-      bundleVersion: pkgConfig.version,
-      cepVersion: pkgConfig.cepVersion,
-      hosts: pkgConfig.hosts,
-      iconNormal: pkgConfig.iconNormal,
-      iconRollover: pkgConfig.iconRollover,
-      iconDarkNormal: pkgConfig.iconDarkNormal,
-      iconDarkRollover: pkgConfig.iconDarkRollover,
-      panelWidth: pkgConfig.panelWidth,
-      panelHeight: pkgConfig.panelHeight,
-      panelMinWidth: pkgConfig.panelMinWidth,
-      panelMinHeight: pkgConfig.panelMinHeight,
-      panelMaxWidth: pkgConfig.panelMaxWidth,
-      panelMaxHeight: pkgConfig.panelMaxHeight,
-      debugPorts: pkgConfig.debugPorts,
-      debugInProduction: pkgConfig.debugInProduction,
-      lifecycle: pkgConfig.lifecycle,
-      cefParams: pkgConfig.cefParams,
-      extensions: pkgConfig.extensions
-    },
-    {
-      bundleVersion: pkg.version,
-    },
-    {
-      ...mergeExtensionDefaults({}),
-      bundleName: 'CEP Extension',
-      bundleId: 'com.mycompany.myextension',
-      bundleVersion: '0.0.1',
-      hosts: '*',
-      debugInProduction: false,
-      cepVersion: '6.0'
-    }
+  return {
+    bundleName: pkgConfig.name,
+    bundleId: pkgConfig.id,
+    bundleVersion: pkgConfig.version,
+    cepVersion: pkgConfig.cepVersion,
+    hosts: pkgConfig.hosts,
+    iconNormal: pkgConfig.iconNormal,
+    iconRollover: pkgConfig.iconRollover,
+    iconDarkNormal: pkgConfig.iconDarkNormal,
+    iconDarkRollover: pkgConfig.iconDarkRollover,
+    panelWidth: pkgConfig.panelWidth,
+    panelHeight: pkgConfig.panelHeight,
+    panelMinWidth: pkgConfig.panelMinWidth,
+    panelMinHeight: pkgConfig.panelMinHeight,
+    panelMaxWidth: pkgConfig.panelMaxWidth,
+    panelMaxHeight: pkgConfig.panelMaxHeight,
+    debugPorts: pkgConfig.debugPorts,
+    debugInProduction: pkgConfig.debugInProduction,
+    lifecycle: pkgConfig.lifecycle,
+    cefParams: pkgConfig.cefParams,
+    extensions: pkgConfig.extensions
+  }
+}
+
+function getConfigDefaults() {
+  return {
+    ...getExtensionDefaults(),
+    bundleName: 'CEP Extension',
+    bundleId: 'com.mycompany.myextension',
+    bundleVersion: '0.0.1',
+    hosts: '*',
+    debugInProduction: false,
+    cepVersion: '6.0'
+  }
+}
+
+export function getConfig(pkg, env) {
+  const config = defaults(
+    getEnvConfig(),
+    getPkgConfig(pkg, env),
+    getConfigDefaults()
   )
+  config.hosts = parseHosts(config.hosts)
   let extensions = []
   if (Array.isArray(config.extensions)) {
-    extensions = config.extensions.map(extension =>
-      mergeExtensionDefaults(extension)
-    )
+    extensions = config.extensions.map(extension => {
+      return {
+        ...getExtensionDefaults(),
+        extension
+      }
+    })
   } else {
     extensions.push({
       id: config.bundleId,
@@ -294,7 +307,7 @@ export function copyIcons({
   )
 }
 
-function mergeExtensionDefaults(extension) {
+function getExtensionDefaults() {
   return {
     panelWidth: 500,
     panelHeight: 500,
@@ -324,8 +337,7 @@ function mergeExtensionDefaults(extension) {
       DRWV: 3010,
       MUST: 3011,
       KBRG: 3012,
-    },
-    ...extension
+    }
   }
 }
 
@@ -338,28 +350,19 @@ export function compile(opts) {
   opts.devPort = opts.devPort ? opts.devPort : 8080
   opts.isDev = opts.hasOwnProperty('isDev') ? opts.isDev : false
   const config = getConfig(opts.pkg, opts.env)
-  const hosts = parseHosts(config.hosts)
   const allOpts = {
-      ...opts,
-      ...config,
-      hosts,
+    ...opts,
+    ...config,
   }
   let chain = Promise.resolve()
   if (opts.isDev) {
     enablePlayerDebugMode()
     if (!config.noSymlink) {
-      chain = chain.then(() =>
-        symlinkExtension(allOpts)
-      )
+      chain = chain.then(() => symlinkExtension(allOpts))
     }
   }
-  chain = chain.then(() =>
-    copyDependencies(allOpts)
-  ).then(() =>
-    writeExtensionTemplates(allOpts)
-  )
-  .then(() =>
-    copyIcons(allOpts)
-  )
+  chain = chain.then(() => copyDependencies(allOpts))
+    .then(() => writeExtensionTemplates(allOpts))
+    .then(() => copyIcons(allOpts))
   return chain
 }
