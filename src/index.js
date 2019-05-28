@@ -138,7 +138,7 @@ export function getConfig(pkg, env) {
     extensions = config.extensions.map(extension => {
       return {
         ...getExtensionDefaults(),
-        extension
+        ...extension
       }
     })
   } else {

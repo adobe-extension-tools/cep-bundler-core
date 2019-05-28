@@ -260,9 +260,7 @@ function getConfig(pkg, env) {
 
   if (Array.isArray(config.extensions)) {
     extensions = config.extensions.map(function (extension) {
-      return _objectSpread({}, getExtensionDefaults(), {
-        extension: extension
-      });
+      return _objectSpread({}, getExtensionDefaults(), extension);
     });
   } else {
     extensions.push(_objectSpread({
