@@ -240,7 +240,6 @@ function getConfigDefaults() {
   return _objectSpread({}, getExtensionDefaults(), {
     bundleName: 'CEP Extension',
     bundleId: 'com.mycompany.myextension',
-    bundleVersion: '0.0.1',
     hosts: '*',
     debugInProduction: false,
     cepVersion: '6.0'
@@ -248,7 +247,9 @@ function getConfigDefaults() {
 }
 
 function getConfig(pkg, env) {
-  var config = defaults(getEnvConfig(), getPkgConfig(pkg, env), getConfigDefaults());
+  var config = defaults(getEnvConfig(), getPkgConfig(pkg, env), getConfigDefaults(), {
+    bundleVersion: pkg.version
+  });
   config.hosts = parseHosts(config.hosts);
   var extensions = [];
 

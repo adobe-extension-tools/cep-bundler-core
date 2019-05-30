@@ -119,7 +119,6 @@ function getConfigDefaults() {
     ...getExtensionDefaults(),
     bundleName: 'CEP Extension',
     bundleId: 'com.mycompany.myextension',
-    bundleVersion: '0.0.1',
     hosts: '*',
     debugInProduction: false,
     cepVersion: '6.0'
@@ -130,7 +129,10 @@ export function getConfig(pkg, env) {
   const config = defaults(
     getEnvConfig(),
     getPkgConfig(pkg, env),
-    getConfigDefaults()
+    getConfigDefaults(),
+    {
+      bundleVersion: pkg.version
+    }
   )
   config.hosts = parseHosts(config.hosts)
   let extensions = []
