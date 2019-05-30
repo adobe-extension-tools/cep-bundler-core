@@ -238,6 +238,7 @@ function getPkgConfig(pkg, env) {
     debugInProduction: pkgConfig.debugInProduction,
     lifecycle: pkgConfig.lifecycle,
     cefParams: pkgConfig.cefParams,
+    htmlFilename: pkgConfig.htmlFilename,
     extensions: pkgConfig.extensions
   };
 }
@@ -432,7 +433,7 @@ function getExtensionDefaults() {
   return {
     panelWidth: 500,
     panelHeight: 500,
-    htmlFilename: 'index.html',
+    htmlFilename: './index.html',
     devPort: 8080,
     devHost: 'localhost',
     lifecycle: {
@@ -460,7 +461,7 @@ function getExtensionDefaults() {
 function compile(opts) {
   opts.env = opts.env ? opts.env : process.env.NODE_ENV;
   opts.root = opts.root ? opts.root : process.cwd();
-  opts.htmlFilename = opts.htmlFilename ? opts.htmlFilename : 'index.html';
+  opts.htmlFilename = opts.htmlFilename ? opts.htmlFilename : './index.html';
   opts.pkg = opts.pkg ? opts.pkg : require(path.join(opts.root, '/package.json'));
   opts.devHost = opts.devHost ? opts.devHost : 'localhost';
   opts.devPort = opts.devPort ? opts.devPort : 8080;
