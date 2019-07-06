@@ -1,6 +1,6 @@
 {
   "name": "cep-bundler-core",
-  "version": "0.0.22",
+  "version": "0.0.23",
   "description": "Core functionality for making bundler extensions to compile CEP",
   "main": "dist/cep-bundler-core.cjs.js",
   "module": "dist/cep-bundler-core.esm.js",

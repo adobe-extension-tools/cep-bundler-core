@@ -202,7 +202,7 @@ function getEnvConfig() {
     panelMaxWidth: process.env.CEP_PANEL_MAX_WIDTH,
     panelMaxHeight: process.env.CEP_PANEL_MAX_HEIGHT,
     debugPorts: debugPortEnvs.length > 0 ? debugPortEnvs.reduce(function (obj, key) {
-      obj[key] = parseInt(process.env[key], 10);
+      obj[key.replace('CEP_DEBUG_PORT_', '')] = parseInt(process.env[key], 10);
       return obj;
     }, {}) : undefined,
     debugInProduction: isTruthy(process.env.CEP_DEBUG_IN_PRODUCTION) || undefined,
@@ -464,6 +464,9 @@ function compile(opts) {
 
   var allOpts = _objectSpread({}, opts, config);
 
+  console.log('config', config);
+  console.log('opts', opts);
+  console.log('allOpts', allOpts);
   var chain = Promise.resolve();
 
   if (opts.isDev) {

@@ -27,7 +27,7 @@ tape('config', (t) => {
         t.equal(manifestJson.ExtensionManifest.ExtensionList.Extension._attributes.Id, 'test.id', 'ExtensionList Extension Id should be correct')
         t.equal(manifestJson.ExtensionManifest.ExtensionList.Extension._attributes.Version, '1', 'ExtensionList Extension Version should be correct')
         t.equal(manifestJson.ExtensionManifest.DispatchInfoList.Extension._attributes.Id, 'test.id', 'DispatchInfoList Extension Id should be correct')
-        t.equal(manifestJson.ExtensionManifest.DispatchInfoList.Extension.DispatchInfo.Resources.MainPath._text, 'index.html', 'MainPath should be correct')
+        t.equal(manifestJson.ExtensionManifest.DispatchInfoList.Extension.DispatchInfo.Resources.MainPath._text, './index.html', 'MainPath should be correct')
         t.deepEqual(manifestJson.ExtensionManifest.DispatchInfoList.Extension.DispatchInfo.Resources.CEFCommandLine.Parameter, ['--allow-file-access-from-files', '--allow-file-access', '--enable-nodejs', '--mixed-context'].map(c => ({
             _text: c
         })), 'CefParams should be correct')
@@ -67,7 +67,7 @@ tape('environments', (t) => {
         t.equal(manifestJson.ExtensionManifest.ExtensionList.Extension._attributes.Id, 'test.id', 'ExtensionList Extension Id should be correct')
         t.equal(manifestJson.ExtensionManifest.ExtensionList.Extension._attributes.Version, '1', 'ExtensionList Extension Version should be correct')
         t.equal(manifestJson.ExtensionManifest.DispatchInfoList.Extension._attributes.Id, 'test.id', 'DispatchInfoList Extension Id should be correct')
-        t.equal(manifestJson.ExtensionManifest.DispatchInfoList.Extension.DispatchInfo.Resources.MainPath._text, 'index.html', 'MainPath should be correct')
+        t.equal(manifestJson.ExtensionManifest.DispatchInfoList.Extension.DispatchInfo.Resources.MainPath._text, './index.html', 'MainPath should be correct')
         t.deepEqual(manifestJson.ExtensionManifest.DispatchInfoList.Extension.DispatchInfo.Resources.CEFCommandLine.Parameter, ['--allow-file-access-from-files', '--allow-file-access', '--enable-nodejs', '--mixed-context'].map(c => ({
             _text: c
         })), 'CefParams should be correct')
@@ -102,7 +102,7 @@ tape('environment variables', (t) => {
         t.equal(manifestJson.ExtensionManifest.ExtensionList.Extension._attributes.Id, 'test.id', 'ExtensionList Extension Id should be correct')
         t.equal(manifestJson.ExtensionManifest.ExtensionList.Extension._attributes.Version, '1', 'ExtensionList Extension Version should be correct')
         t.equal(manifestJson.ExtensionManifest.DispatchInfoList.Extension._attributes.Id, 'test.id', 'DispatchInfoList Extension Id should be correct')
-        t.equal(manifestJson.ExtensionManifest.DispatchInfoList.Extension.DispatchInfo.Resources.MainPath._text, 'index.html', 'MainPath should be correct')
+        t.equal(manifestJson.ExtensionManifest.DispatchInfoList.Extension.DispatchInfo.Resources.MainPath._text, './index.html', 'MainPath should be correct')
         t.deepEqual(manifestJson.ExtensionManifest.DispatchInfoList.Extension.DispatchInfo.Resources.CEFCommandLine.Parameter, ['--allow-file-access-from-files', '--allow-file-access', '--enable-nodejs', '--mixed-context'].map(c => ({
             _text: c
         })), 'CefParams should be correct')

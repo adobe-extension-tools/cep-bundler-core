@@ -73,7 +73,7 @@ function getEnvConfig() {
     panelMaxHeight: process.env.CEP_PANEL_MAX_HEIGHT,
     debugPorts: debugPortEnvs.length > 0
       ? debugPortEnvs.reduce((obj, key) => {
-        obj[key] = parseInt(process.env[key], 10)
+        obj[key.replace('CEP_DEBUG_PORT_', '')] = parseInt(process.env[key], 10)
         return obj
       }, {})
       : undefined,
