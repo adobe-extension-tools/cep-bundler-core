@@ -464,9 +464,6 @@ function compile(opts) {
 
   var allOpts = _objectSpread({}, opts, config);
 
-  console.log('config', config);
-  console.log('opts', opts);
-  console.log('allOpts', allOpts);
   var chain = Promise.resolve();
 
   if (opts.isDev) {
