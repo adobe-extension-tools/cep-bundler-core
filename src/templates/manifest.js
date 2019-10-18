@@ -15,7 +15,7 @@ export default ({
   extensions
 }) => {
   return `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<ExtensionManifest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ExtensionBundleId="${bundleId}" ExtensionBundleName="${bundleName}" ExtensionBundleVersion="${bundleVersion}" Version="${cepVersion}">
+<ExtensionManifest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ExtensionBundleId="${bundleId}" ExtensionBundleName="${bundleName}" ExtensionBundleVersion="${bundleVersion}" Version="7.0">
   <ExtensionList>
     ${extensions.map(extension => `<Extension Id="${extension.id}" Version="${bundleVersion}" />`).join('\n    ')}
   </ExtensionList>
