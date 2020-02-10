@@ -19,20 +19,35 @@ function _defineProperty(obj, key, value) {
   return obj;
 }
 
-function _objectSpread(target) {
+function ownKeys(object, enumerableOnly) {
+  var keys = Object.keys(object);
+
+  if (Object.getOwnPropertySymbols) {
+    var symbols = Object.getOwnPropertySymbols(object);
+    if (enumerableOnly) symbols = symbols.filter(function (sym) {
+      return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+    });
+    keys.push.apply(keys, symbols);
+  }
+
+  return keys;
+}
+
+function _objectSpread2(target) {
   for (var i = 1; i < arguments.length; i++) {
     var source = arguments[i] != null ? arguments[i] : {};
-    var ownKeys = Object.keys(source);
 
-    if (typeof Object.getOwnPropertySymbols === 'function') {
-      ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
-        return Object.getOwnPropertyDescriptor(source, sym).enumerable;
-      }));
+    if (i % 2) {
+      ownKeys(Object(source), true).forEach(function (key) {
+        _defineProperty(target, key, source[key]);
+      });
+    } else if (Object.getOwnPropertyDescriptors) {
+      Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+    } else {
+      ownKeys(Object(source)).forEach(function (key) {
+        Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+      });
     }
-
-    ownKeys.forEach(function (key) {
-      _defineProperty(target, key, source[key]);
-    });
   }
 
   return target;
@@ -47,6 +62,10 @@ function _arrayWithHoles(arr) {
 }
 
 function _iterableToArrayLimit(arr, i) {
+  if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) {
+    return;
+  }
+
   var _arr = [];
   var _n = true;
   var _d = false;
@@ -238,7 +257,7 @@ function getPkgConfig(pkg, env) {
 }
 
 function getConfigDefaults() {
-  return _objectSpread({}, getExtensionDefaults(), {
+  return _objectSpread2({}, getExtensionDefaults(), {
     bundleName: 'CEP Extension',
     bundleId: 'com.mycompany.myextension',
     hosts: '*',
@@ -256,10 +275,10 @@ function getConfig(pkg, env) {
 
   if (Array.isArray(config.extensions)) {
     extensions = config.extensions.map(function (extension) {
-      return _objectSpread({}, getExtensionDefaults(), extension);
+      return _objectSpread2({}, getExtensionDefaults(), {}, extension);
     });
   } else {
-    extensions.push(_objectSpread({
+    extensions.push(_objectSpread2({
       id: config.bundleId,
       name: config.bundleName
     }, config));
@@ -375,6 +394,10 @@ function copyDependencies(_ref3) {
       pkg = _ref3.pkg;
   var deps = pkg.dependencies || {};
   return Object.keys(deps).reduce(function (chain, dep) {
+    if (dep.indexOf('/') !== -1) {
+      dep = dep.split('/')[0];
+    }
+
     var src = path.join(root, 'node_modules', dep);
     var dest = path.join(out, 'node_modules', dep);
     var exists = false;
@@ -389,11 +412,16 @@ function copyDependencies(_ref3) {
       })["catch"](function () {
         console.error("Could not copy ".concat(src, " to ").concat(dest, ". Ensure the path is correct."));
       }).then(function () {
-        return copyDependencies({
-          root: root,
-          out: out,
-          pkg: fs.readJsonSync(path.join(root, 'node_modules', dep, 'package.json'))
-        });
+        try {
+          var packageJson = fs.readJsonSync(path.join(root, 'node_modules', dep, 'package.json'));
+          return copyDependencies({
+            root: root,
+            out: out,
+            pkg: packageJson
+          });
+        } catch (err) {
+          return;
+        }
       });
       return chain;
     }
@@ -462,7 +490,7 @@ function compile(opts) {
   opts.isDev = opts.hasOwnProperty('isDev') ? opts.isDev : false;
   var config = getConfig(opts.pkg, opts.env);
 
-  var allOpts = _objectSpread({}, opts, config);
+  var allOpts = _objectSpread2({}, opts, {}, config);
 
   var chain = Promise.resolve();
 
