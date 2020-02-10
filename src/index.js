@@ -122,7 +122,7 @@ function getConfigDefaults() {
     bundleId: 'com.mycompany.myextension',
     hosts: '*',
     debugInProduction: false,
-    cepVersion: '6.0'
+    cepVersion: '7.0'
   }
 }
 
