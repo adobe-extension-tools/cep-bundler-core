@@ -24,16 +24,16 @@
   "author": "Koen Schmeets",
   "license": "MIT",
   "dependencies": {
-    "fs-extra": "^7.0.1",
-    "lodash": "^4.17.15",
-    "yargs": "^13.3.0"
+    "lodash": "^4.17.15"
   },
   "devDependencies": {
-    "@babel/core": "^7.8.4",
-    "@babel/preset-env": "^7.8.4",
-    "rollup": "^1.31.0",
-    "rollup-plugin-babel": "^4.3.3",
-    "tape": "^4.13.0",
-    "xml-js": "^1.6.11"
+    "@babel/core": "^7.9.0",
+    "@babel/preset-env": "^7.9.0",
+    "fs-extra": "^9.0.0",
+    "rollup": "^2.1.0",
+    "rollup-plugin-babel": "^4.4.0",
+    "tape": "^4.13.2",
+    "xml-js": "^1.6.11",
+    "yargs": "^15.3.1"
   }
 }
