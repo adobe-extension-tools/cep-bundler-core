@@ -286,9 +286,9 @@ function getConfigDefaults() {
 }
 
 function getConfig(pkg, env) {
-  var config = _objectSpread2({}, getEnvConfig(), {}, getPkgConfig(pkg, env), {}, getConfigDefaults(), {}, {
+  var config = _objectSpread2({}, {
     bundleVersion: pkg.version
-  });
+  }, {}, getConfigDefaults(), {}, getPkgConfig(pkg, env), {}, getEnvConfig());
 
   config.hosts = parseHosts(config.hosts);
   var extensions = [];

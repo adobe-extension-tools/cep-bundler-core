@@ -127,12 +127,12 @@ function getConfigDefaults() {
 
 export function getConfig(pkg, env) {
   const config = {
-    ...getEnvConfig(),
-    ...getPkgConfig(pkg, env),
-    ...getConfigDefaults(),
     ...{
       bundleVersion: pkg.version
-    }
+    },
+    ...getConfigDefaults(),
+    ...getPkgConfig(pkg, env),
+    ...getEnvConfig(),
   }
   config.hosts = parseHosts(config.hosts)
   let extensions = []
