@@ -2,6 +2,7 @@ import os from 'os';
 import path from 'path';
 import { execSync } from 'child_process';
 import fs from 'fs-extra';
+import defaults from 'lodash.defaults';
 
 function _defineProperty(obj, key, value) {
   if (key in obj) {
@@ -280,10 +281,9 @@ function getConfigDefaults() {
 }
 
 function getConfig(pkg, env) {
-  var config = _objectSpread2({}, {
+  var config = defaults(getEnvConfig(), getPkgConfig(pkg, env), getConfigDefaults(), {
     bundleVersion: pkg.version
-  }, {}, getConfigDefaults(), {}, getPkgConfig(pkg, env), {}, getEnvConfig());
-
+  });
   config.hosts = parseHosts(config.hosts);
   var extensions = [];
 

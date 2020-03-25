@@ -8,6 +8,7 @@ var os = _interopDefault(require('os'));
 var path = _interopDefault(require('path'));
 var child_process = require('child_process');
 var fs = _interopDefault(require('fs-extra'));
+var defaults = _interopDefault(require('lodash.defaults'));
 
 function _defineProperty(obj, key, value) {
   if (key in obj) {
@@ -286,10 +287,9 @@ function getConfigDefaults() {
 }
 
 function getConfig(pkg, env) {
-  var config = _objectSpread2({}, {
+  var config = defaults(getEnvConfig(), getPkgConfig(pkg, env), getConfigDefaults(), {
     bundleVersion: pkg.version
-  }, {}, getConfigDefaults(), {}, getPkgConfig(pkg, env), {}, getEnvConfig());
-
+  });
   config.hosts = parseHosts(config.hosts);
   var extensions = [];
 
