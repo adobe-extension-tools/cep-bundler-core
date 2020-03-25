@@ -2,20 +2,19 @@ import os from 'os'
 import path from 'path'
 import { execSync } from 'child_process'
 import fs from 'fs-extra'
-import { range, defaults } from 'lodash'
 
 import manifestTemplate from './templates/manifest'
 import panelTemplate from './templates/html'
 import debugTemplate from './templates/.debug'
 
 function templateDebug(formatter) {
-  return range(4, 16)
+  return [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
     .map(formatter)
     .join(os.EOL)
 }
 
 export function enablePlayerDebugMode() {
-  // enable unsigned extensions for the foreseable future
+  // enable unsigned extensions
   if (process.platform === 'darwin') {
     execSync(
       templateDebug(i => `defaults write com.adobe.CSXS.${i} PlayerDebugMode 1`)
@@ -30,7 +29,7 @@ export function enablePlayerDebugMode() {
 }
 
 export function disablePlayerDebugMode() {
-  // disable unsigned extensions for the foreseable future
+  // disable unsigned extensions
   if (process.platform === 'darwin') {
     execSync(
       templateDebug(i => `defaults write com.adobe.CSXS.${i} PlayerDebugMode 0`)
@@ -127,14 +126,14 @@ function getConfigDefaults() {
 }
 
 export function getConfig(pkg, env) {
-  const config = defaults(
-    getEnvConfig(),
-    getPkgConfig(pkg, env),
-    getConfigDefaults(),
-    {
+  const config = {
+    ...getEnvConfig(),
+    ...getPkgConfig(pkg, env),
+    ...getConfigDefaults(),
+    ...{
       bundleVersion: pkg.version
     }
-  )
+  }
   config.hosts = parseHosts(config.hosts)
   let extensions = []
   if (Array.isArray(config.extensions)) {

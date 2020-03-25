@@ -23,9 +23,7 @@
   ],
   "author": "Koen Schmeets",
   "license": "MIT",
-  "dependencies": {
-    "lodash": "^4.17.15"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@babel/core": "^7.9.0",
     "@babel/preset-env": "^7.9.0",

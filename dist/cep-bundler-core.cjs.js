@@ -8,7 +8,6 @@ var os = _interopDefault(require('os'));
 var path = _interopDefault(require('path'));
 var child_process = require('child_process');
 var fs = _interopDefault(require('fs-extra'));
-var lodash = require('lodash');
 
 function _defineProperty(obj, key, value) {
   if (key in obj) {
@@ -182,11 +181,11 @@ var debugTemplate = (function (_ref) {
 });
 
 function templateDebug(formatter) {
-  return lodash.range(4, 16).map(formatter).join(os.EOL);
+  return [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].map(formatter).join(os.EOL);
 }
 
 function enablePlayerDebugMode() {
-  // enable unsigned extensions for the foreseable future
+  // enable unsigned extensions
   if (process.platform === 'darwin') {
     child_process.execSync(templateDebug(function (i) {
       return "defaults write com.adobe.CSXS.".concat(i, " PlayerDebugMode 1");
@@ -198,7 +197,7 @@ function enablePlayerDebugMode() {
   }
 }
 function disablePlayerDebugMode() {
-  // disable unsigned extensions for the foreseable future
+  // disable unsigned extensions
   if (process.platform === 'darwin') {
     child_process.execSync(templateDebug(function (i) {
       return "defaults write com.adobe.CSXS.".concat(i, " PlayerDebugMode 0");
@@ -287,9 +286,10 @@ function getConfigDefaults() {
 }
 
 function getConfig(pkg, env) {
-  var config = lodash.defaults(getEnvConfig(), getPkgConfig(pkg, env), getConfigDefaults(), {
+  var config = _objectSpread2({}, getEnvConfig(), {}, getPkgConfig(pkg, env), {}, getConfigDefaults(), {}, {
     bundleVersion: pkg.version
   });
+
   config.hosts = parseHosts(config.hosts);
   var extensions = [];
 

@@ -14,7 +14,6 @@ export default {
     })
   ],
   external: [
-    'lodash',
     'os',
     'path',
     'fs-extra',
