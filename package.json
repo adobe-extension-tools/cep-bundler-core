@@ -1,6 +1,6 @@
 {
   "name": "cep-bundler-core",
-  "version": "0.0.30",
+  "version": "0.0.31",
   "description": "Core functionality for making bundler extensions to compile CEP",
   "main": "dist/cep-bundler-core.cjs.js",
   "module": "dist/cep-bundler-core.esm.js",
@@ -25,6 +25,7 @@
   "license": "MIT",
   "dependencies": {
     "fs-extra": "^9.0.0",
+    "lodash.defaults": "^4.2.0",
     "yargs": "^15.3.1"
   },
   "devDependencies": {

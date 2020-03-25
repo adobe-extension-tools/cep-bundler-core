@@ -2,7 +2,7 @@ import os from 'os'
 import path from 'path'
 import { execSync } from 'child_process'
 import fs from 'fs-extra'
-
+import defaults from 'lodash.defaults'
 import manifestTemplate from './templates/manifest'
 import panelTemplate from './templates/html'
 import debugTemplate from './templates/.debug'
@@ -126,14 +126,14 @@ function getConfigDefaults() {
 }
 
 export function getConfig(pkg, env) {
-  const config = {
-    ...{
+  const config = defaults(
+    getEnvConfig(),
+    getPkgConfig(pkg, env),
+    getConfigDefaults(),
+    {
       bundleVersion: pkg.version
-    },
-    ...getConfigDefaults(),
-    ...getPkgConfig(pkg, env),
-    ...getEnvConfig(),
-  }
+    }
+  )
   config.hosts = parseHosts(config.hosts)
   let extensions = []
   if (Array.isArray(config.extensions)) {
