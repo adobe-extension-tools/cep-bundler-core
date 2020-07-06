@@ -23,7 +23,7 @@ tape('config', (t) => {
         t.equal(manifestJson.ExtensionManifest._attributes.ExtensionBundleId, 'test.id', 'ExtensionBundleId should be correct')
         t.equal(manifestJson.ExtensionManifest._attributes.ExtensionBundleName, 'test name', 'ExtensionBundleName should be correct')
         t.equal(manifestJson.ExtensionManifest._attributes.ExtensionBundleVersion, '1', 'ExtensionBundleVersion should be correct')
-        t.equal(manifestJson.ExtensionManifest._attributes.Version, '7.0', 'Version should be correct')
+        t.equal(manifestJson.ExtensionManifest._attributes.Version, '8.0', 'Version should be correct')
         t.equal(manifestJson.ExtensionManifest.ExtensionList.Extension._attributes.Id, 'test.id', 'ExtensionList Extension Id should be correct')
         t.equal(manifestJson.ExtensionManifest.ExtensionList.Extension._attributes.Version, '1', 'ExtensionList Extension Version should be correct')
         t.equal(manifestJson.ExtensionManifest.DispatchInfoList.Extension._attributes.Id, 'test.id', 'DispatchInfoList Extension Id should be correct')
@@ -63,7 +63,7 @@ tape('environments', (t) => {
         t.equal(manifestJson.ExtensionManifest._attributes.ExtensionBundleId, 'test.id', 'ExtensionBundleId should be correct')
         t.equal(manifestJson.ExtensionManifest._attributes.ExtensionBundleName, 'test name', 'ExtensionBundleName should be correct')
         t.equal(manifestJson.ExtensionManifest._attributes.ExtensionBundleVersion, '1', 'ExtensionBundleVersion should be correct')
-        t.equal(manifestJson.ExtensionManifest._attributes.Version, '7.0', 'Version should be correct')
+        t.equal(manifestJson.ExtensionManifest._attributes.Version, '8.0', 'Version should be correct')
         t.equal(manifestJson.ExtensionManifest.ExtensionList.Extension._attributes.Id, 'test.id', 'ExtensionList Extension Id should be correct')
         t.equal(manifestJson.ExtensionManifest.ExtensionList.Extension._attributes.Version, '1', 'ExtensionList Extension Version should be correct')
         t.equal(manifestJson.ExtensionManifest.DispatchInfoList.Extension._attributes.Id, 'test.id', 'DispatchInfoList Extension Id should be correct')
@@ -84,7 +84,7 @@ tape('environment variables', (t) => {
     process.env.CEP_NAME = 'test name'
     process.env.CEP_ID = 'test.id'
     process.env.CEP_VERSION = '1'
-    process.env.CEP_CEP_VERSION = '7.0'
+    process.env.CEP_CEP_VERSION = '8.0'
     CepBundlerCore.compile({
         out: './test',
         root: __dirname,
@@ -98,7 +98,7 @@ tape('environment variables', (t) => {
         t.equal(manifestJson.ExtensionManifest._attributes.ExtensionBundleId, 'test.id', 'ExtensionBundleId should be correct')
         t.equal(manifestJson.ExtensionManifest._attributes.ExtensionBundleName, 'test name', 'ExtensionBundleName should be correct')
         t.equal(manifestJson.ExtensionManifest._attributes.ExtensionBundleVersion, '1', 'ExtensionBundleVersion should be correct')
-        t.equal(manifestJson.ExtensionManifest._attributes.Version, '7.0', 'Version should be correct')
+        t.equal(manifestJson.ExtensionManifest._attributes.Version, '8.0', 'Version should be correct')
         t.equal(manifestJson.ExtensionManifest.ExtensionList.Extension._attributes.Id, 'test.id', 'ExtensionList Extension Id should be correct')
         t.equal(manifestJson.ExtensionManifest.ExtensionList.Extension._attributes.Version, '1', 'ExtensionList Extension Version should be correct')
         t.equal(manifestJson.ExtensionManifest.DispatchInfoList.Extension._attributes.Id, 'test.id', 'DispatchInfoList Extension Id should be correct')
@@ -139,7 +139,7 @@ tape('development', (t) => {
         t.equal(manifestJson.ExtensionManifest._attributes.ExtensionBundleId, 'test.id', 'ExtensionBundleId should be correct')
         t.equal(manifestJson.ExtensionManifest._attributes.ExtensionBundleName, 'test name', 'ExtensionBundleName should be correct')
         t.equal(manifestJson.ExtensionManifest._attributes.ExtensionBundleVersion, '1', 'ExtensionBundleVersion should be correct')
-        t.equal(manifestJson.ExtensionManifest._attributes.Version, '7.0', 'Version should be correct')
+        t.equal(manifestJson.ExtensionManifest._attributes.Version, '8.0', 'Version should be correct')
         t.equal(manifestJson.ExtensionManifest.ExtensionList.Extension._attributes.Id, 'test.id', 'ExtensionList Extension Id should be correct')
         t.equal(manifestJson.ExtensionManifest.ExtensionList.Extension._attributes.Version, '1', 'ExtensionList Extension Version should be correct')
         t.equal(manifestJson.ExtensionManifest.DispatchInfoList.Extension._attributes.Id, 'test.id', 'DispatchInfoList Extension Id should be correct')

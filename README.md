@@ -9,8 +9,6 @@ const core = require('cep-bundler-core')
 core.compile({
   out: '/path/to/dist',          // REQUIRED type: string
   isDev: false,                  // OPTIONAL type: boolean, default: false
-  devPort: 8080,                 // OPTIONAL type: number, default: 8080
-  devHost: 'localhost',          // OPTIONAL type: string, default: localhost
   env: 'production',             // OPTIONAL type: string, default: process.env.NODE_ENV
   root: '/path/to/project/root', // OPTIONAL type: string, default: process.cwd()
   htmlFilename: './index.html',  // OPTIONAL type: string, default: 'index.html'
@@ -25,10 +23,6 @@ The `out` option specifies where the `manifest.xml`, `dev.html`, `node_modules` 
 ### isDev
 
 When `isDev` is true, the bundler will create a `dev.html` file that contains a redirect to `http://${devHost}:${devPort}`, when `isDev` is false, it will not create a dev.html file but will set the `MainPath` in the `manifest.xml` to the value set through the `htmlFilename` option.
-
-### devPort & devHost
-
-See the `isDev` option above, these options are used to specify where your bundler dev server is running, when compiling with `isDev` set to true, a html file will be created that will redirect to your dev server.
 
 ### env
 
@@ -255,6 +249,18 @@ CEP_DEBUG_IN_PRODUCTION="1"
 Environment variable:
 ```bash
 CEP_CEF_PARAMS="--allow-file-access-from-files,--allow-file-access,--enable-nodejs,--mixed-context"
+```
+
+#### Dev host & port
+
+```json
+"devHost": "localhost",
+"devPort": 8080,
+```
+Environment variable:
+```bash
+CEP_DEV_HOST="localhost"
+CEP_DEV_PORT="8080"
 ```
 
 ## Credits

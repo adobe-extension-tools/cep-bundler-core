@@ -17,16 +17,6 @@ var argv = require('yargs')
         describe: 'Enable development mode',
         default: false
     })
-    .option('dev-port', {
-        alias: 'p',
-        describe: 'Set development server port',
-        default: 8080
-    })
-    .option('dev-host', {
-        alias: 'h',
-        describe: 'Set development server host',
-        default: 'localhost'
-    })
     .help()
     .argv
 
@@ -34,8 +24,6 @@ var bundler = require('./dist/cep-bundler-core.cjs')
 
 bundler.compile({
     out: argv.out,
-    devPort: argv.devPort,
-    devHost: argv.devHost,
     root: argv.in === '.' || argv.in === './' ? process.cwd() : argv.in,
     htmlFilename: 'index.html',
     isDev: argv.dev

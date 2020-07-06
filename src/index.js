@@ -70,6 +70,8 @@ function getEnvConfig() {
     panelMinHeight: process.env.CEP_PANEL_MIN_HEIGHT,
     panelMaxWidth: process.env.CEP_PANEL_MAX_WIDTH,
     panelMaxHeight: process.env.CEP_PANEL_MAX_HEIGHT,
+    devHost: process.env.CEP_DEV_HOST,
+    devPort: !process.env.CEP_DEV_PORT ? undefined : Number(process.env.CEP_DEV_PORT),
     debugPorts: debugPortEnvs.length > 0
       ? debugPortEnvs.reduce((obj, key) => {
         obj[key.replace('CEP_DEBUG_PORT_', '')] = parseInt(process.env[key], 10)
@@ -110,38 +112,76 @@ function getPkgConfig(pkg, env) {
     lifecycle: pkgConfig.lifecycle,
     cefParams: pkgConfig.cefParams,
     htmlFilename: pkgConfig.htmlFilename,
-    extensions: pkgConfig.extensions
+    extensions: pkgConfig.extensions,
+    devHost: pkgConfig.devHost,
+    devPort: pkgConfig.devPort,
   }
 }
 
 function getConfigDefaults() {
   return {
-    ...getExtensionDefaults(),
     bundleName: 'CEP Extension',
     bundleId: 'com.mycompany.myextension',
     hosts: '*',
     debugInProduction: false,
-    cepVersion: '7.0'
+    cepVersion: '8.0',
+    panelWidth: 500,
+    panelHeight: 500,
+    htmlFilename: './index.html',
+    devHost: 'localhost',
+    devPort: 8080,
+    lifecycle: {
+      autoVisible: true,
+      startOnEvents: []
+    },
+    cefParams: [
+      '--allow-file-access-from-files',
+      '--allow-file-access',
+      '--enable-nodejs',
+      '--mixed-context'
+    ],
+    debugPorts: {
+      PHXS: 3001,
+      IDSN: 3002,
+      AICY: 3003,
+      ILST: 3004,
+      PPRO: 3005,
+      PRLD: 3006,
+      AEFT: 3007,
+      FLPR: 3008,
+      AUDT: 3009,
+      DRWV: 3010,
+      MUST: 3011,
+      KBRG: 3012,
+    }
   }
 }
 
-export function getConfig(pkg, env) {
-  const config = {
-    ...getEnvConfig(),
-    ...getPkgConfig(pkg, env),
-    ...getConfigDefaults(),
-    ...{
-      bundleVersion: pkg.version
-    }
+function assignDefined(target, ...sources) {
+  for (const source of sources) {
+      for (const key of Object.keys(source)) {
+          const val = source[key];
+          if (val !== undefined) {
+              target[key] = val;
+          }
+      }
   }
+  return target;
+}
+
+export function getConfig(pkg, env) {
+  const config = assignDefined(
+    {}, 
+    getConfigDefaults(),
+    getPkgConfig(pkg, env),
+    getEnvConfig()
+  )
+  // console.log('DEFAULTS', config)
   config.hosts = parseHosts(config.hosts)
   let extensions = []
   if (Array.isArray(config.extensions)) {
     extensions = config.extensions.map(extension => {
-      return {
-        ...getExtensionDefaults(),
-        ...extension
-      }
+      return assignDefined({}, config, extension)
     })
   } else {
     extensions.push({
@@ -151,6 +191,7 @@ export function getConfig(pkg, env) {
     })
   }
   config.extensions = extensions
+  // console.log('FINAL', config)
   return config
 }
 
@@ -318,47 +359,14 @@ export function copyIcons({
   )
 }
 
-function getExtensionDefaults() {
-  return {
-    panelWidth: 500,
-    panelHeight: 500,
-    htmlFilename: './index.html',
-    devPort: 8080,
-    devHost: 'localhost',
-    lifecycle: {
-      autoVisible: true,
-      startOnEvents: []
-    },
-    cefParams: [
-      '--allow-file-access-from-files',
-      '--allow-file-access',
-      '--enable-nodejs',
-      '--mixed-context'
-    ],
-    debugPorts: {
-      PHXS: 3001,
-      IDSN: 3002,
-      AICY: 3003,
-      ILST: 3004,
-      PPRO: 3005,
-      PRLD: 3006,
-      AEFT: 3007,
-      FLPR: 3008,
-      AUDT: 3009,
-      DRWV: 3010,
-      MUST: 3011,
-      KBRG: 3012,
-    }
-  }
-}
-
 export function compile(opts) {
   opts.env = opts.env ? opts.env : process.env.NODE_ENV
   opts.root = opts.root ? opts.root : process.cwd()
   opts.htmlFilename = opts.htmlFilename ? opts.htmlFilename : './index.html'
   opts.pkg = opts.pkg ? opts.pkg : require(path.join(opts.root, '/package.json'))
-  opts.devHost = opts.devHost ? opts.devHost : 'localhost'
-  opts.devPort = opts.devPort ? opts.devPort : 8080
+  if (opts.devPort || opts.devHost) {
+    throw new Error('devPort and devHost can only be passed in through the package.json config or using ENV variables now, please update your cep.config.js and package.json or env variables')
+  }
   opts.isDev = opts.hasOwnProperty('isDev') ? opts.isDev : false
   const config = getConfig(opts.pkg, opts.env)
   const allOpts = {
