@@ -7,23 +7,17 @@ import manifestTemplate from './templates/manifest'
 import panelTemplate from './templates/html'
 import debugTemplate from './templates/.debug'
 
-function templateDebug(formatter) {
-  return [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
-    .map(formatter)
-    .join(os.EOL)
+function templateDebug(formatter: any) {
+  return [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].map(formatter).join(os.EOL)
 }
 
 export function enablePlayerDebugMode() {
   // enable unsigned extensions
   if (process.platform === 'darwin') {
+    execSync(templateDebug((i: number) => `defaults write com.adobe.CSXS.${i} PlayerDebugMode 1`))
+  } else {
     execSync(
-      templateDebug(i => `defaults write com.adobe.CSXS.${i} PlayerDebugMode 1`)
-    )
-  } else if (process.platform === 'win32') {
-    execSync(
-      templateDebug(
-        i => `REG ADD HKCU\\Software\\Adobe\\CSXS.${i} /f /v PlayerDebugMode /t REG_SZ /d 1`
-      )
+      templateDebug((i: number) => `REG ADD HKCU\\Software\\Adobe\\CSXS.${i} /f /v PlayerDebugMode /t REG_SZ /d 1`),
     )
   }
 }
@@ -31,29 +25,22 @@ export function enablePlayerDebugMode() {
 export function disablePlayerDebugMode() {
   // disable unsigned extensions
   if (process.platform === 'darwin') {
-    execSync(
-      templateDebug(i => `defaults write com.adobe.CSXS.${i} PlayerDebugMode 0`)
-    )
-  } else if (process.platform === 'win32') {
-    execSync(
-      templateDebug(
-        i => `REG DELETE HKCU\\Software\\Adobe\\CSXS.${i} /f /v PlayerDebugMode`
-      )
-    )
+    execSync(templateDebug((i: number) => `defaults write com.adobe.CSXS.${i} PlayerDebugMode 0`))
+  } else {
+    execSync(templateDebug((i: number) => `REG DELETE HKCU\\Software\\Adobe\\CSXS.${i} /f /v PlayerDebugMode`))
   }
 }
 
-function camelToSnake(str) {
+function camelToSnake(str: string) {
   return str.replace(/([A-Z])/g, (part) => `_${part.toLowerCase()}`)
 }
 
-function isTruthy(str) {
+function isTruthy(str: any) {
   return typeof str === 'string' && (str === '1' || str.toLowerCase() === 'true')
 }
 
 function getEnvConfig() {
-  const debugPortEnvs = Object.keys(process.env)
-    .filter((key) => key.indexOf('CEP_DEBUG_PORT_') === 0)
+  const debugPortEnvs = Object.keys(process.env).filter((key) => key.indexOf('CEP_DEBUG_PORT_') === 0)
   return {
     bundleName: process.env.CEP_NAME,
     bundleId: process.env.CEP_ID,
@@ -72,25 +59,20 @@ function getEnvConfig() {
     panelMaxHeight: process.env.CEP_PANEL_MAX_HEIGHT,
     devHost: process.env.CEP_DEV_HOST,
     devPort: !process.env.CEP_DEV_PORT ? undefined : Number(process.env.CEP_DEV_PORT),
-    debugPorts: debugPortEnvs.length > 0
-      ? debugPortEnvs.reduce((obj, key) => {
-        obj[key.replace('CEP_DEBUG_PORT_', '')] = parseInt(process.env[key], 10)
-        return obj
-      }, {})
-      : undefined,
+    debugPorts:
+      debugPortEnvs.length > 0
+        ? debugPortEnvs.reduce((obj, key) => {
+            obj[key.replace('CEP_DEBUG_PORT_', '')] = parseInt(process.env[key] || '', 10)
+            return obj
+          }, {} as any)
+        : undefined,
     debugInProduction: isTruthy(process.env.CEP_DEBUG_IN_PRODUCTION) || undefined,
-    cefParams: !process.env.CEP_CEF_PARAMS ? undefined : process.env.CEP_CEF_PARAMS.split(',')
+    cefParams: !process.env.CEP_CEF_PARAMS ? undefined : process.env.CEP_CEF_PARAMS.split(','),
   }
 }
 
-function getPkgConfig(pkg, env) {
-  const pkgConfig = pkg.hasOwnProperty('cep')
-    ? (
-      pkg.cep.hasOwnProperty(env)
-        ? pkg.cep[env]
-        : pkg.cep
-    )
-    : {}
+function getPkgConfig(pkg: any, env?: string) {
+  const pkgConfig = pkg.hasOwnProperty('cep') ? (env && pkg.cep.hasOwnProperty(env) ? pkg.cep[env] : pkg.cep) : {}
   return {
     bundleName: pkgConfig.name,
     bundleId: pkgConfig.id,
@@ -132,14 +114,9 @@ function getConfigDefaults() {
     devPort: 8080,
     lifecycle: {
       autoVisible: true,
-      startOnEvents: []
+      startOnEvents: [],
     },
-    cefParams: [
-      '--allow-file-access-from-files',
-      '--allow-file-access',
-      '--enable-nodejs',
-      '--mixed-context'
-    ],
+    cefParams: ['--allow-file-access-from-files', '--allow-file-access', '--enable-nodejs', '--mixed-context'],
     debugPorts: {
       PHXS: 3001,
       IDSN: 3002,
@@ -153,41 +130,36 @@ function getConfigDefaults() {
       DRWV: 3010,
       MUST: 3011,
       KBRG: 3012,
+    },
+  }
+}
+
+function assignDefined(target: any, ...sources: any) {
+  for (const source of sources) {
+    for (const key of Object.keys(source)) {
+      const val = source[key]
+      if (val !== undefined) {
+        target[key] = val
+      }
     }
   }
+  return target
 }
 
-function assignDefined(target, ...sources) {
-  for (const source of sources) {
-      for (const key of Object.keys(source)) {
-          const val = source[key];
-          if (val !== undefined) {
-              target[key] = val;
-          }
-      }
-  }
-  return target;
-}
-
-export function getConfig(pkg, env) {
-  const config = assignDefined(
-    {}, 
-    getConfigDefaults(),
-    getPkgConfig(pkg, env),
-    getEnvConfig()
-  )
+export function getConfig(pkg: any, env?: string) {
+  const config = assignDefined({}, getConfigDefaults(), getPkgConfig(pkg, env), getEnvConfig())
   // console.log('DEFAULTS', config)
   config.hosts = parseHosts(config.hosts)
   let extensions = []
   if (Array.isArray(config.extensions)) {
-    extensions = config.extensions.map(extension => {
+    extensions = config.extensions.map((extension: any) => {
       return assignDefined({}, config, extension)
     })
   } else {
     extensions.push({
       id: config.bundleId,
       name: config.bundleName,
-      ...config
+      ...config,
     })
   }
   config.extensions = extensions
@@ -195,25 +167,18 @@ export function getConfig(pkg, env) {
   return config
 }
 
-export function objectToProcessEnv(obj) {
+export function objectToProcessEnv(obj: any) {
   // assign object to process.env so they can be used in the code
-  Object.keys(obj).forEach(key => {
+  Object.keys(obj).forEach((key) => {
     const envKey = camelToSnake(key).toUpperCase()
-    const value = typeof obj[key] === 'string'
-      ? obj[key]
-      : JSON.stringify(obj[key])
+    const value = typeof obj[key] === 'string' ? obj[key] : JSON.stringify(obj[key])
     process.env[envKey] = value
   })
 }
 
-export function writeExtensionTemplates(opts) {
+export function writeExtensionTemplates(opts: any) {
   const manifestContents = manifestTemplate(opts)
-  const {
-    out,
-    debugInProduction,
-    isDev,
-    extensions
-  } = opts
+  const { out, debugInProduction, isDev, extensions } = opts
   const manifestDir = path.join(out, 'CSXS')
   const manifestFile = path.join(manifestDir, 'manifest.xml')
   return Promise.resolve()
@@ -226,11 +191,11 @@ export function writeExtensionTemplates(opts) {
         chain = chain.then(() => fs.writeFile(path.join(out, '.debug'), debugContents))
       }
       if (isDev) {
-        extensions.forEach(extension => {
+        extensions.forEach((extension: any) => {
           const href = `http://${extension.devHost}:${extension.devPort}`
           const panelContents = panelTemplate({
             title: extension.name,
-            href
+            href,
           })
           chain = chain.then(() => fs.writeFile(path.join(out, `dev.${extension.id}.html`), panelContents))
         })
@@ -239,13 +204,13 @@ export function writeExtensionTemplates(opts) {
     })
 }
 
-export function parseHosts(hostsString) {
-  if (hostsString == '*')
-    hostsString = `PHXS, IDSN, AICY, ILST, PPRO, PRLD, AEFT, FLPR, AUDT, DRWV, MUST, KBRG`
+export function parseHosts(hostsString: string) {
+  if (hostsString == '*') hostsString = `PHXS, IDSN, AICY, ILST, PPRO, PRLD, AEFT, FLPR, AUDT, DRWV, MUST, KBRG`
   const hosts = hostsString
     .split(/(?![^)(]*\([^)(]*?\)\)),(?![^\[]*\])/)
-    .map(host => host.trim())
-    .map(host => {
+    .map((host) => host.trim())
+    .map((host) => {
+      // @ts-ignore
       let [name, version] = host.split('@')
       if (version == '*' || !version) {
         version = '[0.0,99.9]'
@@ -260,26 +225,23 @@ export function parseHosts(hostsString) {
   return hosts
 }
 
-export function getExtenstionPath() {
+export function getExtensionPath() {
   if (process.platform == 'darwin') {
-    return path.join(
-      os.homedir(),
-      '/Library/Application Support/Adobe/CEP/extensions'
-    )
-  } else if (process.platform == 'win32') {
-    return path.join(process.env.APPDATA, 'Adobe/CEP/extensions')
+    return path.join(os.homedir(), '/Library/Application Support/Adobe/CEP/extensions')
+  } else {
+    return path.join(process.env.APPDATA || '', 'Adobe/CEP/extensions')
   }
 }
 
-function getSymlinkExtensionPath({ bundleId }) {
-  const extensionPath = getExtenstionPath()
+function getSymlinkExtensionPath({ bundleId }: { bundleId: string }) {
+  const extensionPath = getExtensionPath()
   return path.join(extensionPath, bundleId)
 }
 
-export function symlinkExtension({ bundleId, out }) {
+export function symlinkExtension({ bundleId, out }: { bundleId: string; out: string }) {
   const target = getSymlinkExtensionPath({ bundleId })
   return Promise.resolve()
-    .then(() => fs.ensureDir(getExtenstionPath()))
+    .then(() => fs.ensureDir(getExtensionPath()))
     .then(() => fs.remove(target))
     .then(() => {
       if (process.platform === 'win32') {
@@ -290,7 +252,7 @@ export function symlinkExtension({ bundleId, out }) {
     })
 }
 
-export function copyDependencies({ root, out, pkg }) {
+export function copyDependencies({ root, out, pkg }: { root: string; out: string; pkg: any }) {
   const deps = pkg.dependencies || {}
   return Object.keys(deps).reduce((chain, dep) => {
     if (dep.indexOf('/') !== -1) {
@@ -300,15 +262,13 @@ export function copyDependencies({ root, out, pkg }) {
     const dest = path.join(out, 'node_modules', dep)
     let exists = false
     try {
-      exists = fs.statSync(dest).isFile();
+      exists = fs.statSync(dest).isFile()
     } catch (err) {}
     if (!exists) {
       chain = chain
         .then(() => fs.copy(src, dest))
         .catch(() => {
-          console.error(
-            `Could not copy ${src} to ${dest}. Ensure the path is correct.`
-          )
+          console.error(`Could not copy ${src} to ${dest}. Ensure the path is correct.`)
         })
         .then(() => {
           try {
@@ -316,7 +276,7 @@ export function copyDependencies({ root, out, pkg }) {
             return copyDependencies({
               root,
               out,
-              pkg: packageJson
+              pkg: packageJson,
             })
           } catch (err) {
             return
@@ -328,45 +288,35 @@ export function copyDependencies({ root, out, pkg }) {
   }, Promise.resolve())
 }
 
-export function copyIcons({
-  root,
-  out,
-  iconNormal,
-  iconRollover,
-  iconDarkNormal,
-  iconDarkRollover
-}) {
-  const iconPaths = [
-    iconNormal,
-    iconRollover,
-    iconDarkNormal,
-    iconDarkRollover,
-  ]
-    .filter(icon => icon !== undefined)
-    .map(icon => ({
-        source: path.resolve(root, icon),
-        output: path.join(out, path.relative(root, icon)),
+export function copyIcons({ root, out, iconNormal, iconRollover, iconDarkNormal, iconDarkRollover }: any) {
+  const iconPaths = [iconNormal, iconRollover, iconDarkNormal, iconDarkRollover]
+    .filter((icon) => icon !== undefined)
+    .map((icon) => ({
+      source: path.resolve(root, icon),
+      output: path.join(out, path.relative(root, icon)),
     }))
   return Promise.all(
-    iconPaths.map(icon => {
-      return fs.copy(icon.source, icon.output)
-        .catch(() => {
-          console.error(
-            `Could not copy ${icon.source}. Ensure the path is correct.`
-          )
-        })
-    })
+    iconPaths.map((icon) => {
+      return fs.copy(icon.source, icon.output).catch(() => {
+        console.error(`Could not copy ${icon.source}. Ensure the path is correct.`)
+      })
+    }),
   )
 }
 
-export function compile(opts) {
+interface CompileOptions {
+  env?: string
+  root?: string
+  htmlFilename?: string
+  isDev?: boolean
+  pkg?: any
+}
+
+export function compile(opts: CompileOptions) {
   opts.env = opts.env ? opts.env : process.env.NODE_ENV
   opts.root = opts.root ? opts.root : process.cwd()
   opts.htmlFilename = opts.htmlFilename ? opts.htmlFilename : './index.html'
   opts.pkg = opts.pkg ? opts.pkg : require(path.join(opts.root, '/package.json'))
-  if (opts.devPort || opts.devHost) {
-    throw new Error('devPort and devHost can only be passed in through the package.json config or using ENV variables now, please update your cep.config.js and package.json or env variables')
-  }
   opts.isDev = opts.hasOwnProperty('isDev') ? opts.isDev : false
   const config = getConfig(opts.pkg, opts.env)
   const allOpts = {
@@ -380,8 +330,12 @@ export function compile(opts) {
       chain = chain.then(() => symlinkExtension(allOpts))
     }
   }
-  chain = chain.then(() => copyDependencies(allOpts))
+  chain = chain
+    .then(() => copyDependencies(allOpts))
     .then(() => writeExtensionTemplates(allOpts))
     .then(() => copyIcons(allOpts))
+    .then(() => {
+      // noop
+    })
   return chain
 }

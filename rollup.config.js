@@ -1,34 +1,33 @@
-import babel from 'rollup-plugin-babel'
-import pkg from './package.json'
+import externals from 'rollup-plugin-node-externals'
+// import resolve from '@rollup/plugin-node-resolve'
+// import commonjs from '@rollup/plugin-commonjs'
+import typescript from 'rollup-plugin-typescript2'
+import packageJson from './package.json'
 
 export default {
-	input: './src/index.js',
-	plugins: [
-    babel({
-      babelrc: false,
-      presets: [
-        ['@babel/preset-env', {
-          modules: false
-        }]
-      ],
-    })
-  ],
-  external: [
-    'os',
-    'path',
-    'fs-extra',
-    'child_process',
-  ],
-	output: [
+  input: 'src/index.ts',
+  output: [
     {
-      file: pkg.main,
+      file: packageJson.main,
       format: 'cjs',
-      sourcemap: true
+      sourcemap: true,
     },
     {
-      file: pkg.module,
-      format: 'es',
-      sourcemap: true
+      file: packageJson.module,
+      format: 'esm',
+      sourcemap: true,
     },
-  ]
+  ],
+  plugins: [
+    externals({
+      builtins: true,
+      deps: true,
+      devDeps: false,
+      peerDeps: true,
+      optDeps: true,
+    }),
+    // resolve(),
+    // commonjs(),
+    typescript({ useTsconfigDeclarationDir: true }),
+  ],
 }
