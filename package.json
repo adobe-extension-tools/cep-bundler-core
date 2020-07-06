@@ -1,6 +1,6 @@
 {
   "name": "cep-bundler-core",
-  "version": "0.1.28",
+  "version": "0.2.0",
   "description": "Core functionality for making bundler extensions to compile CEP",
   "main": "dist/cep-bundler-core.cjs.js",
   "module": "dist/cep-bundler-core.esm.js",
@@ -25,13 +25,13 @@
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
-    "@babel/core": "^7.9.0",
-    "@babel/preset-env": "^7.9.0",
-    "fs-extra": "^9.0.0",
-    "rollup": "^2.1.0",
+    "@babel/core": "^7.10.4",
+    "@babel/preset-env": "^7.10.4",
+    "fs-extra": "^9.0.1",
+    "rollup": "^2.19.0",
     "rollup-plugin-babel": "^4.4.0",
-    "tape": "^4.13.2",
+    "tape": "^5.0.1",
     "xml-js": "^1.6.11",
-    "yargs": "^15.3.1"
+    "yargs": "^15.4.0"
   }
 }
