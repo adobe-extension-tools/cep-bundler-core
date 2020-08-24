@@ -246,6 +246,7 @@ function getEnvConfig() {
       return obj;
     }, {}) : undefined,
     debugInProduction: isTruthy(process.env.CEP_DEBUG_IN_PRODUCTION) || undefined,
+    menu: isTruthy(process.env.CEP_MENU) || undefined,
     cefParams: !process.env.CEP_CEF_PARAMS ? undefined : process.env.CEP_CEF_PARAMS.split(',')
   };
 }
@@ -271,6 +272,7 @@ function getPkgConfig(pkg, env) {
     panelMaxHeight: pkgConfig.panelMaxHeight,
     debugPorts: pkgConfig.debugPorts,
     debugInProduction: pkgConfig.debugInProduction,
+    menu: pkgConfig.menu,
     lifecycle: pkgConfig.lifecycle,
     cefParams: pkgConfig.cefParams,
     htmlFilename: pkgConfig.htmlFilename,
@@ -486,6 +488,7 @@ function getExtensionDefaults() {
     htmlFilename: './index.html',
     devPort: 8080,
     devHost: 'localhost',
+    menu: true,
     lifecycle: {
       autoVisible: true,
       startOnEvents: []

@@ -244,6 +244,21 @@ CEP_DEBUG_PORT_MUST="3011"
 CEP_DEBUG_PORT_KBRG="3012"
 ```
 
+#### Extensions Menu Visibility
+
+Optional. This setting determines whether to show an extension in the 'Extensions' menu in the host app.
+
+- `"menu"` - Defaults to `true`.
+
+```json
+"menu": true
+```
+
+Environment variable:
+```bash
+CEP_MENU="1"
+```
+
 #### Lifecycle Settings
 
 Optional. This settings object controls startup and shutdown behavior.
