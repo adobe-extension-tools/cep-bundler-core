@@ -244,6 +244,30 @@ CEP_DEBUG_PORT_MUST="3011"
 CEP_DEBUG_PORT_KBRG="3012"
 ```
 
+#### Lifecycle Settings
+
+Optional. This settings object controls startup and shutdown behavior.
+
+- `"autoVisible"` - Defaults to `true`. Whether the panel UI should be shown automatically on creation.
+- `"startOnEvents"` - Array of event id strings to listen for that will start this extension.
+
+For a panel that starts hidden:
+```json
+"lifecycle": {
+  "autovisible": false,
+  "startOnEvents": [
+    // Photoshop dispatches this event on startup
+    "applicationActivate",
+
+    // Premiere Pro dispatches this event on startup
+    "com.adobe.csxs.events.ApplicationActivate",
+
+    // Your custom events
+    "another_event"
+  ]
+}
+```
+
 #### Debug in production
 
 Enabling this will create the .debug file, even when building for production.
