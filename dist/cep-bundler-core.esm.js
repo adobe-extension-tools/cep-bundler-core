@@ -288,8 +288,13 @@ function getConfig(pkg, env) {
   var extensions = [];
 
   if (Array.isArray(config.extensions)) {
-    extensions = config.extensions.map(function (extension) {
-      return _objectSpread2({}, getExtensionDefaults(), {}, extension);
+    extensions = config.extensions.map(function (extension, ii) {
+      var extDefaults = getExtensionDefaults();
+      Object.keys(extDefaults.debugPorts).forEach(function (host) {
+        var port = extDefaults.debugPorts[host];
+        extDefaults.debugPorts[host] = port + ii * 1000;
+      });
+      return _objectSpread2({}, extDefaults, {}, extension);
     });
   } else {
     extensions.push(_objectSpread2({

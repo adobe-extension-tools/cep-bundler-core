@@ -137,9 +137,14 @@ export function getConfig(pkg, env) {
   config.hosts = parseHosts(config.hosts)
   let extensions = []
   if (Array.isArray(config.extensions)) {
-    extensions = config.extensions.map(extension => {
+    extensions = config.extensions.map((extension, ii) => {
+      const extDefaults = getExtensionDefaults();
+      Object.keys(extDefaults.debugPorts).forEach(function (host) {
+        var port = extDefaults.debugPorts[host];
+        extDefaults.debugPorts[host] = port + ii * 1000;
+      });
       return {
-        ...getExtensionDefaults(),
+        ...extDefaults,
         ...extension
       }
     })
