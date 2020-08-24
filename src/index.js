@@ -60,6 +60,7 @@ function getEnvConfig() {
     bundleVersion: process.env.CEP_VERSION,
     cepVersion: process.env.CEP_CEP_VERSION,
     hosts: process.env.CEP_HOSTS,
+    type: process.env.CEP_PANEL_TYPE,
     iconNormal: process.env.CEP_ICON_NORMAL,
     iconRollover: process.env.CEP_ICON_ROLLOVER,
     iconDarkNormal: process.env.CEP_ICON_DARK_NORMAL,
@@ -95,6 +96,7 @@ function getPkgConfig(pkg, env) {
     bundleVersion: pkgConfig.version,
     cepVersion: pkgConfig.cepVersion,
     hosts: pkgConfig.hosts,
+    type: process.type,
     iconNormal: pkgConfig.iconNormal,
     iconRollover: pkgConfig.iconRollover,
     iconDarkNormal: pkgConfig.iconDarkNormal,
@@ -325,6 +327,7 @@ export function copyIcons({
 
 function getExtensionDefaults() {
   return {
+    type: 'Panel',
     panelWidth: 500,
     panelHeight: 500,
     htmlFilename: './index.html',

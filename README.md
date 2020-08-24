@@ -114,9 +114,23 @@ Environment variable: `CEP_VERSION`
 This sets the name of extension as it will show in the application.
 
 ```json
-"name: "My Extension"
+"name": "My Extension"
 ```
 Environment variable: `CEP_NAME`
+
+#### Type
+
+Optional. This is the panel type for the extension. One of:
+
+- `"Panel"`: Default, standard extension panel
+- `"ModalDialog"`: A blocking extension window, forcing the user to only interact with this panel until closed.
+- `"Modeless"`: A non-blocking extension window that doesn't force interaction.
+- `"Custom"`: See [Invisible HTML Extensions](https://github.com/Adobe-CEP/CEP-Resources/blob/master/CEP_9.x/Documentation/CEP%209.0%20HTML%20Extension%20Cookbook.md#invisible-html-extensions)
+
+```json
+"type": "Panel"
+```
+Environment variable: `CEP_PANEL_TYPE`
 
 #### Hosts
 

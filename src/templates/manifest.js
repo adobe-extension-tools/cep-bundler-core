@@ -65,7 +65,7 @@ export default ({
           <AutoVisible>${extension.lifecycle.autoVisible}</AutoVisible>${startOn}
         </Lifecycle>
         <UI>
-          <Type>${extension.type || 'Panel'}</Type>
+          <Type>${extension.type}</Type>
           ${extension.menu === false ? '' : `<Menu>${extension.name}</Menu>`}
           <Geometry>${size}${minSize}${maxSize}
           </Geometry>${icons ? `
