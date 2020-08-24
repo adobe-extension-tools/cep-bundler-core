@@ -161,7 +161,7 @@ var manifestTemplate = (function (_ref) {
     var startOn = !extension.lifecycle.startOnEvents || extension.lifecycle.startOnEvents.length === 0 ? '' : "\n          <StartOn>\n            ".concat(extension.lifecycle.startOnEvents.map(function (e) {
       return "<Event>".concat(e, "</Event>");
     }).join('\n            '), "\n          </StartOn>");
-    return "<Extension Id=\"".concat(extension.id, "\">\n      <DispatchInfo>\n        <Resources>\n          <MainPath>").concat(isDev ? "./dev.".concat(extension.id, ".html") : extension.htmlFilename, "</MainPath>\n          <CEFCommandLine>\n            ").concat(commandLineParams.join('\n            '), "\n          </CEFCommandLine>\n        </Resources>\n        <Lifecycle>\n          <AutoVisible>").concat(extension.lifecycle.autoVisible, "</AutoVisible>").concat(startOn, "\n        </Lifecycle>\n        <UI>\n          <Type>").concat(extension.type || 'Panel', "</Type>\n          ").concat(extension.menu === false ? '' : "<Menu>".concat(extension.name, "</Menu>"), "\n          <Geometry>").concat(size).concat(minSize).concat(maxSize, "\n          </Geometry>").concat(icons ? "\n          <Icons>".concat(icons, "</Icons>") : '', "\n        </UI>\n      </DispatchInfo>\n    </Extension>");
+    return "<Extension Id=\"".concat(extension.id, "\">\n      <DispatchInfo>\n        <Resources>\n          <MainPath>").concat(isDev ? "./dev.".concat(extension.id, ".html") : extension.htmlFilename, "</MainPath>\n          <CEFCommandLine>\n            ").concat(commandLineParams.join('\n            '), "\n          </CEFCommandLine>\n        </Resources>\n        <Lifecycle>\n          <AutoVisible>").concat(extension.lifecycle.autoVisible, "</AutoVisible>").concat(startOn, "\n        </Lifecycle>\n        <UI>\n          <Type>").concat(extension.type, "</Type>\n          ").concat(extension.menu === false ? '' : "<Menu>".concat(extension.name, "</Menu>"), "\n          <Geometry>").concat(size).concat(minSize).concat(maxSize, "\n          </Geometry>").concat(icons ? "\n          <Icons>".concat(icons, "</Icons>") : '', "\n        </UI>\n      </DispatchInfo>\n    </Extension>");
   }).join('\n    '), "\n  </DispatchInfoList>\n</ExtensionManifest>");
 });
 
@@ -230,6 +230,7 @@ function getEnvConfig() {
     bundleVersion: process.env.CEP_VERSION,
     cepVersion: process.env.CEP_CEP_VERSION,
     hosts: process.env.CEP_HOSTS,
+    type: process.env.CEP_PANEL_TYPE,
     iconNormal: process.env.CEP_ICON_NORMAL,
     iconRollover: process.env.CEP_ICON_ROLLOVER,
     iconDarkNormal: process.env.CEP_ICON_DARK_NORMAL,
@@ -245,6 +246,7 @@ function getEnvConfig() {
       return obj;
     }, {}) : undefined,
     debugInProduction: isTruthy(process.env.CEP_DEBUG_IN_PRODUCTION) || undefined,
+    menu: isTruthy(process.env.CEP_MENU) || undefined,
     cefParams: !process.env.CEP_CEF_PARAMS ? undefined : process.env.CEP_CEF_PARAMS.split(',')
   };
 }
@@ -257,6 +259,7 @@ function getPkgConfig(pkg, env) {
     bundleVersion: pkgConfig.version,
     cepVersion: pkgConfig.cepVersion,
     hosts: pkgConfig.hosts,
+    type: process.type,
     iconNormal: pkgConfig.iconNormal,
     iconRollover: pkgConfig.iconRollover,
     iconDarkNormal: pkgConfig.iconDarkNormal,
@@ -269,6 +272,7 @@ function getPkgConfig(pkg, env) {
     panelMaxHeight: pkgConfig.panelMaxHeight,
     debugPorts: pkgConfig.debugPorts,
     debugInProduction: pkgConfig.debugInProduction,
+    menu: pkgConfig.menu,
     lifecycle: pkgConfig.lifecycle,
     cefParams: pkgConfig.cefParams,
     htmlFilename: pkgConfig.htmlFilename,
@@ -294,8 +298,13 @@ function getConfig(pkg, env) {
   var extensions = [];
 
   if (Array.isArray(config.extensions)) {
-    extensions = config.extensions.map(function (extension) {
-      return _objectSpread2({}, getExtensionDefaults(), {}, extension);
+    extensions = config.extensions.map(function (extension, ii) {
+      var extDefaults = getExtensionDefaults();
+      Object.keys(extDefaults.debugPorts).forEach(function (host) {
+        var port = extDefaults.debugPorts[host];
+        extDefaults.debugPorts[host] = port + ii * 1000;
+      });
+      return _objectSpread2({}, extDefaults, {}, extension);
     });
   } else {
     extensions.push(_objectSpread2({
@@ -473,11 +482,13 @@ function copyIcons(_ref4) {
 
 function getExtensionDefaults() {
   return {
+    type: 'Panel',
     panelWidth: 500,
     panelHeight: 500,
     htmlFilename: './index.html',
     devPort: 8080,
     devHost: 'localhost',
+    menu: true,
     lifecycle: {
       autoVisible: true,
       startOnEvents: []

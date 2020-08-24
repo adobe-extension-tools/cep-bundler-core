@@ -114,9 +114,23 @@ Environment variable: `CEP_VERSION`
 This sets the name of extension as it will show in the application.
 
 ```json
-"name: "My Extension"
+"name": "My Extension"
 ```
 Environment variable: `CEP_NAME`
+
+#### Type
+
+Optional. This is the panel type for the extension. One of:
+
+- `"Panel"`: Default, standard extension panel
+- `"ModalDialog"`: A blocking extension window, forcing the user to only interact with this panel until closed.
+- `"Modeless"`: A non-blocking extension window that doesn't force interaction.
+- `"Custom"`: See [Invisible HTML Extensions](https://github.com/Adobe-CEP/CEP-Resources/blob/master/CEP_9.x/Documentation/CEP%209.0%20HTML%20Extension%20Cookbook.md#invisible-html-extensions)
+
+```json
+"type": "Panel"
+```
+Environment variable: `CEP_PANEL_TYPE`
 
 #### Hosts
 
@@ -228,6 +242,45 @@ CEP_DEBUG_PORT_AUDT="3009"
 CEP_DEBUG_PORT_DRWV="3010"
 CEP_DEBUG_PORT_MUST="3011"
 CEP_DEBUG_PORT_KBRG="3012"
+```
+
+#### Extensions Menu Visibility
+
+Optional. This setting determines whether to show an extension in the 'Extensions' menu in the host app.
+
+- `"menu"` - Defaults to `true`.
+
+```json
+"menu": true
+```
+
+Environment variable:
+```bash
+CEP_MENU="1"
+```
+
+#### Lifecycle Settings
+
+Optional. This settings object controls startup and shutdown behavior.
+
+- `"autoVisible"` - Defaults to `true`. Whether the panel UI should be shown automatically on creation.
+- `"startOnEvents"` - Array of event id strings to listen for that will start this extension.
+
+For a panel that starts hidden:
+```json
+"lifecycle": {
+  "autovisible": false,
+  "startOnEvents": [
+    // Photoshop dispatches this event on startup
+    "applicationActivate",
+
+    // Premiere Pro dispatches this event on startup
+    "com.adobe.csxs.events.ApplicationActivate",
+
+    // Your custom events
+    "another_event"
+  ]
+}
 ```
 
 #### Debug in production

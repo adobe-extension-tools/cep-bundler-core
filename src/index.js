@@ -60,6 +60,7 @@ function getEnvConfig() {
     bundleVersion: process.env.CEP_VERSION,
     cepVersion: process.env.CEP_CEP_VERSION,
     hosts: process.env.CEP_HOSTS,
+    type: process.env.CEP_PANEL_TYPE,
     iconNormal: process.env.CEP_ICON_NORMAL,
     iconRollover: process.env.CEP_ICON_ROLLOVER,
     iconDarkNormal: process.env.CEP_ICON_DARK_NORMAL,
@@ -77,6 +78,7 @@ function getEnvConfig() {
       }, {})
       : undefined,
     debugInProduction: isTruthy(process.env.CEP_DEBUG_IN_PRODUCTION) || undefined,
+    menu: isTruthy(process.env.CEP_MENU) || undefined,
     cefParams: !process.env.CEP_CEF_PARAMS ? undefined : process.env.CEP_CEF_PARAMS.split(',')
   }
 }
@@ -95,6 +97,7 @@ function getPkgConfig(pkg, env) {
     bundleVersion: pkgConfig.version,
     cepVersion: pkgConfig.cepVersion,
     hosts: pkgConfig.hosts,
+    type: process.type,
     iconNormal: pkgConfig.iconNormal,
     iconRollover: pkgConfig.iconRollover,
     iconDarkNormal: pkgConfig.iconDarkNormal,
@@ -107,6 +110,7 @@ function getPkgConfig(pkg, env) {
     panelMaxHeight: pkgConfig.panelMaxHeight,
     debugPorts: pkgConfig.debugPorts,
     debugInProduction: pkgConfig.debugInProduction,
+    menu: pkgConfig.menu,
     lifecycle: pkgConfig.lifecycle,
     cefParams: pkgConfig.cefParams,
     htmlFilename: pkgConfig.htmlFilename,
@@ -137,9 +141,14 @@ export function getConfig(pkg, env) {
   config.hosts = parseHosts(config.hosts)
   let extensions = []
   if (Array.isArray(config.extensions)) {
-    extensions = config.extensions.map(extension => {
+    extensions = config.extensions.map((extension, ii) => {
+      const extDefaults = getExtensionDefaults();
+      Object.keys(extDefaults.debugPorts).forEach(function (host) {
+        var port = extDefaults.debugPorts[host];
+        extDefaults.debugPorts[host] = port + ii * 1000;
+      });
       return {
-        ...getExtensionDefaults(),
+        ...extDefaults,
         ...extension
       }
     })
@@ -320,11 +329,13 @@ export function copyIcons({
 
 function getExtensionDefaults() {
   return {
+    type: 'Panel',
     panelWidth: 500,
     panelHeight: 500,
     htmlFilename: './index.html',
     devPort: 8080,
     devHost: 'localhost',
+    menu: true,
     lifecycle: {
       autoVisible: true,
       startOnEvents: []
