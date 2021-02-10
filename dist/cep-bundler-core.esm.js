@@ -408,10 +408,6 @@ function copyDependencies(_ref3) {
       pkg = _ref3.pkg;
   var deps = pkg.dependencies || {};
   return Object.keys(deps).reduce(function (chain, dep) {
-    if (dep.indexOf('/') !== -1) {
-      dep = dep.split('/')[0];
-    }
-
     var src = path.join(root, 'node_modules', dep);
     var dest = path.join(out, 'node_modules', dep);
     var exists = false;
